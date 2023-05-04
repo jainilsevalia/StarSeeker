@@ -1,0 +1,156 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+<div class="mx-4 mx-sm-5 my-5">
+  <div class="row">
+    <div class="col">
+      <div class="carousel-container p-3 d-flex flex-column flex-lg-row">
+        <div
+          class="
+            carousel-thumbnails
+            d-flex
+            flex-lg-column
+            mr-lg-3
+            mt-3 mt-lg-0
+            order-12 order-lg-0
+          "
+        >
+          {% for image in product_images %}
+          <div
+            class="cursor-pointer mb-2"
+            data-target="#carousel"
+            data-slide-to="{{ forloop.counter0 }}"
+          >
+            <img class="object-fit-cover br-10" src="{{ image.image.url }}" width="100" height="100"/>
+          </div>
+          {% endfor %}
+          
+          {% for video in product_videos %}
+            <div class="position-relative cursor-pointer" data-target="#carousel" data-slide-to="{{ product_images.count }} + {{ forloop.counter0 }}">
+              <div class="cursor-pointer mb-2 br-10" 
+                 style="background-color: black;">
+                <video width="100" height="100" class="object-fit-cover br-10" style="opacity: .5;">
+                  <source src="{{ video.video.url }}#t=0.1" />
+                </video>
+              </div>
+              <i class="bi bi-play-circle"
+                style="color:white;position: absolute; top: 50%; left: 50%;transform: translate(-50%,-60%);font-size: 2em;"></i>
+            </div>
+          {% endfor %}
+            
+        </div>
+        <div
+          id="carousel"
+          class="carousel slide order-0 order-lg-12 w-100"
+          data-ride="carousel"
+          data-interval="false"
+        >
+          <div class="carousel-inner aspect-ratio-1">
+            {% for image in product_images %}
+            <div
+              class="carousel-item aspect-ratio-1 {% if forloop.first %}active{% endif %}"
+            >
+              <img
+                src="{{ image.image.url }}"
+                class="d-block w-100 h-100 object-fit-cover"
+              />
+            </div>
+            {% endfor %}
+            
+            {% for video in product_videos %}
+              <div class="carousel-item aspect-ratio-1 px-5">
+                <video controls width="100%" height="100%">
+                  <source src="{{ video.video.url }}" />
+                </video>
+              </div>
+            {% endfor %}
+              
+            <a
+              class="carousel-control-prev"
+              href="#carousel"
+              role="button"
+              data-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#carousel"
+              role="button"
+              data-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col px-3 py-2">
+      <h1 class="mb-0"><strong>{{ product.name }}</strong></h1>
+      <div class="ml-1">
+        <div class="mb-3">{{ product.category.name }}</div>
+        <h5><strong>₹ {{ product.price }}</strong></h5>
+        <div>
+          {{ product.description }}
+        </div>
+      </div>
+      <div class="d-flex mt-3">
+        <button class="btn btn-primary fs-9 mr-2 update-cart" data-product={{product.id}} data-action="add">Add to cart</button>
+        {% if product.id in wishlistItems %}
+        <button id="wishlistBtn" class="btn btn-important fs-9" x-data="{id: {{ product.id }} }" @click="handleWishlist(id)">Remove from wishlist</button>
+        {% else %}
+        <button id="wishlistBtn" class="btn btn-secondary fs-9" x-data="{id: {{ product.id }} }" @click="handleWishlist(id)">Add to wishlist</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  const handleWishlist = (pid) => {
+    if('{{ user.is_authenticated }}' === 'False'){
+      Toastify({
+        text: "Please signin for adding product to wishlist",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "center",
+        backgroundColor: "#ffa240",
+        style: {
+          borderRadius: "20px",
+        },
+        stopOnFocus: true,
+      }).showToast();
+    }else{
+      $.post("/store/add_to_wishlist/",{
+        pid,
+        csrfmiddlewaretoken: '{{ csrf_token }}'
+      },(res) => {
+        if(res["msg"].includes("added")){
+          $("#wishlistBtn").text("Remove from wishlist")
+          $("#wishlistBtn").removeClass("btn-secondary").addClass("btn-important")
+        }else{
+          $("#wishlistBtn").text("Add to wishlist")
+          $("#wishlistBtn").removeClass("btn-important").addClass("btn-secondary")
+        }
+        Toastify({
+          text: res["msg"],
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          style: {
+            borderRadius: "20px"
+          },
+          stopOnFocus: true,
+        }).showToast();
+      });
+    }
+  }
+</script>
+{% endblock %}

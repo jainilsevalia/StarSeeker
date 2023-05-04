@@ -1,0 +1,634 @@
+{% extends 'index.html' %}
+{% load static %} 
+{% load social_share %}
+{% block content %} 
+{% load filters %}
+
+
+<div class="mx-4">
+  {% if user.is_authenticated and user.talentuser == talentuser and not user.talentuser.is_kyc_done %}
+  <span class="float-left alert alert-warning">
+    Your KYC is in process. your profile is not visible publicly until it is verified by us.
+  </span>
+  {% endif %}
+  {% if user.talentuser == talentuser %}
+  <span class="float-right bg-darkbluegray br-10 px-3 py-2 fs-95 cursor-pointer" onclick="window.location.href='/user/edittalentprofile/'">Edit this page <i class="bi bi-pencil ml-2"></i></span> 
+  {% endif %}
+</div>
+  
+<div class="row px-4 mt-3">
+  <div class="col-md-5 col-lg-4 col-xl-3 mx-0 order-12 order-md-1">
+    <div class="profile-box d-none d-md-flex flex-column align-items-center">
+      <i class="bi bi-share ml-auto mr-10 cursor-pointer"  onclick="wantToSocialShare()" ></i>
+      <div id="socialshare-desktop" class="socialshare-wrapper d-none">
+        {% post_to_facebook object_or_url  %}
+        {% post_to_twitter "{{object.title}}" object_or_url %}
+        {% post_to_whatsapp object_or_url %}
+        {% send_email object.title "{{object.title}}"  object_or_url %}
+      </div>
+      <div class="profile-img-container  mt-3 " style="width: 170px;height: 170px;">
+        <img
+          src="{% if talentuser.generaluser.profile_picture %}{{ talentuser.generaluser.profile_picture.url }}{% else %}{% static './img/avatar.png' %}{% endif %}"
+          class="rounded-circle profile-img "
+          width="150px"
+        />
+      </div>
+      <span class="mt-2" style="font-weight: bold; font-size: 1.2em">
+        <!-- #TODO: Uncomment the below lines to implement fake name functionality. -->
+        <!-- {# if user.is_authenticated #}         -->
+        {{ talentuser.generaluser.name }}
+        
+        {% if talentuser.gender == 'male' %}
+          <i class="bi bi-gender-male"></i>
+        {% elif talentuser.gender == 'female' %}
+          <i class="bi bi-gender-female"></i>
+        {% else %}
+          <i class="bi bi-gender-trans"></i>
+        {% endif %}
+          
+        <!-- {# else #} -->
+        <!-- {{ talentuser.generaluser.name|fake_name }} -->
+        <!-- {# endif #} -->
+      </span>
+      <span class="fs-85">
+        {% if talentuser.rating_avg != 0 %}
+        <span style="color: rgb(255, 166, 0)">
+          <i class="bi bi-star-fill"></i>
+          {{ talentuser.rating_avg|floatformat }}
+        </span>
+        {% endif %}
+        {{ talentuser.category }}
+      </span>
+      <span class="fs-85"><i class="bi bi-geo-alt"></i> 
+        {% if not talentuser.generaluser.address.city.name or not talentuser.generaluser.address.state.name %}
+        {{ talentuser.generaluser.otherCountry.city }}, {{ talentuser.generaluser.otherCountry.state }}
+        {% else %}          
+        {{  talentuser.generaluser.address.city.name }}, {{  talentuser.generaluser.address.state.name }}
+        {% endif %}
+      </span>
+      <div class="d-flex flex-column">
+        <div class="mt-3">
+          {% if user.is_authenticated %}
+            {% if talentuser.id != user.talentuser.id %}
+              {% if talentuser.id not in cart_item_profiles %}  
+                <button class="btn btn-primary fs-9 add-to-cart-btn" onclick="addToCart()">Add to cart</button>
+              {% else %}
+                <button class="btn btn-primary fs-9 add-to-cart-btn" disabled>Added to cart</button>
+              {% endif %}
+              <button class="btn btn-secondary">
+                <i class="bi bi-people"></i>
+              </button>
+            {% endif %}
+          {% endif %}        
+        </div>
+        <div id="addtowishlist-desktop-container" class="mt-2">
+          {% if user.is_authenticated %}
+            {% if talentuser.generaluser.id != user.id %}
+              {% if inUserwishlist %}
+                <button type='button' class="btn btn-primary fs-9" disabled>
+                  Added to wishlist
+                </button>
+              {% else %}
+                <button value='{{talentuser.id}}' type='button' class="btn btn-primary fs-9" onclick="addToWishlist()">
+                  Add to wishlist
+                </button>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        </div>
+
+      </div>
+      <span class="text-center px-2 fs-8 mt-2">
+        {{ talentuser.achievements }}
+      </span>
+      <span class="mt-3 fs-85"
+        ><span class="h5">₹</span>&ensp; Starting at {{ talentuser.price|floatformat }}/-</span
+      >
+
+      <!-- <span class="mt-3 fs-85 mb-4"
+        ><i class="bi bi-bag-check h5"></i>&ensp; 30 Order completed</span
+      > -->
+    </div>
+
+    <div class="profile-box mt-3">
+      {% if user.is_authenticated %}
+      {% if user != talentuser.generaluser %}
+      <h5 class="ml-2 mt-2"><strong>Give Your feedback</strong></h5>
+      <div id="review-box">
+        <textarea id="review" placeholder="Type here..." rows="6">{{ user_review.comment }}</textarea>
+        <div class="d-flex justify-content-between align-items-center mt-1">
+          <div id="rating">
+            <div class="rating-group">
+              <input disabled checked class="rating__input rating__input--none" name="rating3" id="rating3-none" value="0"
+                type="radio" />
+              <label aria-label="1 star" class="rating__label" for="rating3-1"><i
+                  class="rating__icon rating__icon--star bi bi-star-fill"></i></label>
+              <input class="rating__input" name="rating3" id="rating3-1" value="1" type="radio" />
+              <label aria-label="2 stars" class="rating__label" for="rating3-2"><i
+                  class="rating__icon rating__icon--star bi bi-star-fill"></i></label>
+              <input class="rating__input" name="rating3" id="rating3-2" value="2" type="radio" />
+              <label aria-label="3 stars" class="rating__label" for="rating3-3"><i
+                  class="rating__icon rating__icon--star bi bi-star-fill"></i></label>
+              <input class="rating__input" name="rating3" id="rating3-3" value="3" type="radio" />
+              <label aria-label="4 stars" class="rating__label" for="rating3-4"><i
+                  class="rating__icon rating__icon--star bi bi-star-fill"></i></label>
+              <input class="rating__input" name="rating3" id="rating3-4" value="4" type="radio" />
+              <label aria-label="5 stars" class="rating__label" for="rating3-5"><i
+                  class="rating__icon rating__icon--star bi bi-star-fill"></i></label>
+              <input class="rating__input" name="rating3" id="rating3-5" value="5" type="radio" />
+            </div>
+          </div>
+          <button id="submit-review" class="btn btn-secondary ml-2" style="font-size: 0.95em; height: 35px">
+            Submit
+          </button>
+        </div>
+      </div>
+      <div id="msg_div" class="alert alert-success fade show d-none mt-2" style="max-width: 350px" role="alert">
+        <text id="msg_text"></text>
+      </div>
+      {% endif %}
+      {% else %}
+      <p class="px-2">Only logged in users are allowed to add a comment. Please <a href="{% url 'account_login' %}">signin</a>.</p>
+      {% endif %}
+      <div class="px-2 mt-3">
+        <h5><strong>Review Chart</strong></h5>
+        {% for rating, percent in review_chart_data.items %}
+        <span>{{rating}} Stars</span>
+        <div class="progress mb-2">
+          <div class="progress-bar" role="progressbar" style="width: {{percent}}%" aria-valuenow="{{percent}}"
+            aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7 col-lg-8 col-xl-9 mx-0 mt-3 mt-sm-0 pl-3 pl-sm-2 order-1 order-md-12 ">
+    <div id="aboutme" class="content-box description box-shadow-outset p-3 mb-3 d-none d-md-block">
+      <h5><strong>About</strong></h5>
+      {{ talentuser.description|safe }}
+      <div class="row">
+        {% if talentuser.secondary_skills %}
+          <div class="col-md-4 col-xl-2 border-right border-dark">
+            <h6><strong>Secondary Skills</strong></h6>
+            <div class="key-point-user">{{ talentuser.secondary_skills }}</div>
+          </div>
+        {% endif %}
+        <div class="col-md-4 col-xl-2 border-right border-dark" style="min-width: 200px;">
+          <h6><strong>Professionaly Trained</strong></h6>
+          <div class="key-point-user">
+            {% if talentuser.is_trained %}
+            Yes
+            {% else %}
+            No
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-4 col-xl-2">
+          <h6><strong>Provides Training</strong></h6>
+          <div class="key-point-user">
+            {% if talentuser.provide_training %}
+            Yes
+            {% else %}
+            No
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    {% if talentuser.generaluser.seller and talentuser.generaluser.seller.is_kyc_done %}
+      <a id="visitStore" href="{% url 'personal_store' talentuser.id  %}"
+        class="content-box d-flex justify-content-between align-items-center my-3 cursor-pointer text-decoration-none"
+        style="background-color: #7F73E3;">
+        <h5 class="font-weight-bold ml-2 mt-2 text-white text-decoration-none">Visit {{ talentuser.name }}'s Store</h5>
+        <i class="bi bi-cart4 mr-2" style="font-size: 2em;color: white;"></i>
+      </a>
+    {% endif %}
+      
+
+    <div id="work-gallery" class="content-box">
+      <!-- FOR MOBILE VIEW START  -->
+      <div class="mobile-profile-box" class="ml-2">
+        <div class="mobile-profile-box d-flex align-items-center mb-2">
+          <img
+          {% if talentuser.generaluser.profile_picture %}
+          src="{{ talentuser.generaluser.profile_picture.url }}"
+          {% endif %}
+            width="50px"
+            height="50px"
+            class="rounded-circle mx-1 profile-img"
+          />
+          <div class="d-flex flex-column">
+            <span><b>{{ talentuser.generaluser.name }}</b></span>
+            <div>
+              <span class="fs-85">
+                {% if talentuser.rating_avg != 0 %}
+                <span style="color: rgb(255, 166, 0)">
+                  <i class="bi bi-star-fill"></i>
+                  {{ talentuser.rating_avg|floatformat }}
+                </span>
+                {% endif %}
+                {{ talentuser.category }}
+              </span>
+            </div>
+          </div>
+          <i class="bi bi-share ml-auto mr-2" onclick="wantToSocialShare()"></i>
+        </div>
+        <div id="socialshare-mobile" class="socialshare-wrapper justify-content-center w-100 d-none">
+          {% post_to_facebook object_or_url  %}
+          {% post_to_twitter "{{object.title}}" object_or_url %}
+          {% post_to_whatsapp object_or_url %}
+          {% send_email object.title "{{object.title}}"  object_or_url %}
+        </div>
+      </div>
+      <!-- MOBILE VIEW END  -->
+
+      <div class="px-3 px-sm-2 pt-2">
+        <h5><strong>Work gallery</strong></h5>
+      </div>
+
+      <ul
+        class="nav nav-pill custom-pill ml-2 mb-2 fs-9"
+        id="photo-video-tab"
+        role="tablist"
+        style="height: auto"
+      >
+        <li class="nav-item" role="presentation">
+          <a
+            class="nav-link active"
+            id="photo-tab"
+            data-toggle="tab"
+            href="#photo"
+            role="tab"
+            aria-controls="photo"
+            aria-selected="true"
+            >Photo</a
+          >
+        </li>
+        <li class="nav-item" role="presentation">
+          <a
+            class="nav-link"
+            id="video-tab"
+            data-toggle="tab"
+            href="#video"
+            role="tab"
+            aria-controls="video"
+            aria-selected="false"
+            >Video</a
+          >
+        </li>
+      </ul>
+
+      
+      
+      <div class="tab-content mt-4">
+        <div class="tab-pane active" id="photo" role="tabpanel" aria-labelledby="photo-tab">
+          <div class="talent-content mx-2">
+            {% for timages in talentImages %}
+            <div>
+              <a class="talent-thumbnail-container" href="{{ timages.image.url }}">
+                <img src="{{ timages.image.url }}" class="talent-thumbnail" />
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div
+          class="tab-pane"
+          id="video"
+          role="tabpanel"
+          aria-labelledby="video-tab"
+        >
+          <div class="talent-content mx-2">
+            {% for evideos in embeddedVideos %}
+            {% if evideos.embed_video_url  %}
+                <div class="talent-thumbnail-container mr-2">
+                  <iframe
+                  src="https://www.youtube.com/embed/{{ evideos.embed_video_url }}"
+                  title="YouTube video player"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  class="talent-thumbnail"
+                  ></iframe>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% for tvideos in talentVideos %}
+                {% if tvideos.video %}
+                <div class="talent-thumbnail-container mr-2">
+                  <video controls  class="talent-thumbnail" >
+                    <source src="{{ tvideos.video.url }}"/>
+                  </video>
+                </div>
+                {% endif %}
+              {% endfor %}
+          </div>
+          
+
+        </div>
+      </div>
+
+      <!-- FOR MOBILE VIEW  START -->
+      <div class="mobile-profile-box">
+
+        <div class="description mt-2">
+          <div class="d-flex flex-column">
+            <b>Starting at <span style="font-size: 1.5em">₹ {{ talentuser.price }}/-</span></b>
+            <b class="fs-9">
+              <i class="bi bi-geo-alt"></i> 
+              {% if not talentuser.generaluser.address.city.name or not talentuser.generaluser.address.state.name %}
+              {{ talentuser.generaluser.otherCountry.city }}, {{ talentuser.generaluser.otherCountry.state }}
+              {% else %}          
+              {{  talentuser.generaluser.address.city.name }}, {{  talentuser.generaluser.address.state.name }}
+              {% endif %}
+            </b>
+            <!-- <b class="fs-9 mt-1"
+              ><i class="bi bi-bag-check"></i> 30 Order completed</b
+            > -->
+          </div>
+
+          <div class="d-flex my-4">
+            <button class="btn btn-primary mr-2 fs-9" data-toggle="modal" data-target="#bookmeModalCenter">Book me</button>
+            <button class="btn btn-secondary mr-2">
+              <i class="bi bi-people"></i>
+            </button>
+          
+            <div id="addtowishlist-mobile-container" class="d-flex">
+            {% if user.is_authenticated %}
+              {% if talentuser.generaluser.id != user.id %}
+                {% if inUserwishlist %}
+                  <button type='button' class="btn btn-primary fs-9" disabled>
+                    Added to wishlist
+                  </button>
+                {% else %}
+                  <button value='{{talentuser.id}}' type='button' class="btn btn-primary fs-9" onclick="addToWishlist()">
+                    Add to wishlist
+                  </button>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+            </div>
+
+          </div>    
+          <div>
+            <h5><strong>Achievements</strong></h5>
+            {{ talentuser.achievements }}
+          </div>
+          <hr />
+          <h5><strong>About me</strong></h5>
+          {{ talentuser.description|safe }}
+          <div class="row">
+            <div class="col mb-3">
+              <strong>Secondary Skills</strong>
+              <div class="key-point-user">{{ talentuser.secondary_skills }}</div>
+            </div>
+            <div class="col mb-3">
+              <strong>Professionaly Trained</strong>
+              <div class="key-point-user">
+                {% if talentuser.is_trained %}
+                Yes
+                {% else %}
+                No
+                {% endif %}
+              </div>
+            </div>
+            <div class="col mb-3">
+              <strong>Provides Training</strong>
+              <div class="key-point-user">
+                {% if talentuser.provide_training %}
+                Yes
+                {% else %}
+                No
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- MOBILE VIEW END  -->
+
+      <div class="description mt-3">
+        {% if faqs.count != 0 %}
+          <h5><strong>FAQ</strong></h5>
+        {% endif %}
+        <ol style="padding: 15px">
+          {% for faq in faqs %}
+          <li>
+            <a
+              data-toggle="collapse"
+              href="#question{{ forloop.counter }}"
+              role="button"
+              aria-expanded="false"
+              aria-controls="question{{ forloop.counter }}"
+              class="faq-que"
+            >
+              {{ faq.question }}
+            </a>
+          </li>
+          <div class="collapse" id="question{{ forloop.counter }}">
+            <div>
+              {{ faq.answer }}
+            </div>
+          </div>
+          {% endfor %}
+        </ol>
+      </div>
+      <div class="description mt-3" id="load-comments">
+        {% if comments %}
+          <h5><strong>Comments</strong></h5>
+        {% endif %}
+        {% for c in comments %}
+          <div class="d-flex align-items-center mb-2">
+            <img
+              src="{% if c.comment_by.profile_picture %}{{ c.comment_by.profile_picture.url }}{% else %}{% static './img/avatar.png' %}{% endif %}"
+              width="50px"
+              height="50px"
+              class="rounded-circle mx-1 profile-img"
+            />
+            <div class="d-flex flex-column ml-2">
+              <span><b>{{ c.comment_by.name }} </b>| {{c.rating}} &#9733;</span>
+              <div>
+                {{ c.comment }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <br/>
+    </div>
+  </div>
+</div>
+<br />
+
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery-js/1.4.0/js/lightgallery.min.js"
+  integrity="sha512-b4rL1m5b76KrUhDkj2Vf14Y0l1NtbiNXwV+SzOzLGv6Tz1roJHa70yr8RmTUswrauu2Wgb/xBJPR8v80pQYKtQ=="
+  crossorigin="anonymous"
+></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<script>
+  tippy('.bi-gender-male', {
+    content: 'Male',
+    theme: 'dd',
+    arrow: false,
+    placement: 'right'
+  });
+  tippy('.bi-gender-female', {
+    content: 'Female',
+    theme: 'dd',
+    arrow: false,
+    placement: 'right'
+  });
+  tippy('.bi-gender-trans', {
+    content: 'Other',
+    theme: 'dd',
+    arrow: false,
+    placement: 'right'
+  });
+</script>
+<script type="text/javascript">
+  lightGallery(document.querySelector(".talent-content"), {
+    selector: '.talent-thumbnail-container',
+    download: false,
+  });
+
+  const aboutmeHeight = $("#aboutme").css("height");
+  const visitStoreHeight = $("#visitStore").css("height");
+  
+  $("#work-gallery").css("height",`calc(100% - ${aboutmeHeight} - ${visitStoreHeight} - 6rem)`)
+
+  //ADD TO CART
+  const addToCart = () => {
+    $.ajax({
+      type: 'POST',
+      url: '{% url "talentprofile" talentuser.generaluser.userlink %}',
+      data: { 
+        'cart_talentuser_id': '{{ talentuser.id }}',
+        'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: (response) => {
+        if(response['success']){
+          const addToCartBtn = document.querySelector(".add-to-cart-btn");
+          addToCartBtn.innerText = "Added to cart";
+          addToCartBtn.setAttribute("disabled", "disabled");
+          $("#cart-count").load(location.href + " #cart-count>*")
+        }
+      }
+    })
+  }
+
+  //WISHLIST 
+    const addToWishlist = () => {
+      $.ajax({
+        type: 'GET',
+        url: '{% url "talentprofile" talentuser.generaluser.userlink  %}',
+        data: { 'addtowishlist': '{{ talentuser.id }}' },
+        success: (response) => {
+          if(response['success']){
+            $("#addtowishlist-desktop-container").load(location.href + " #addtowishlist-desktop-container>*");
+            $("#addtowishlist-mobile-container").load(location.href + " #addtowishlist-mobile-container>*");
+          }
+        }
+      })
+    }
+
+    // RATING AND REVIEW 
+    $(document).ready(() => {
+      let rating = parseInt('{{user_review.rating}}');
+      let i = 1;
+      for(i;i<=5;i++){
+        if(rating == $('#rating3-'+i).val()){
+          $('#rating3-'+i).attr('checked',true);
+        }
+      }
+    });
+
+    let  ratingId;
+    $(".rating__input").click(() => {
+      ratingId =  $(this).attr('id');
+    });
+
+    $('#submit-review').click(() => {
+      if($("input[name='rating3']:checked").val() === "0"){
+        $("#msg_div").removeClass("d-none alert-success").addClass("alert-danger");
+        $("#msg_text").text("Please provide rating");
+        return;
+      }
+      $.ajax({
+        type: 'POST',
+        url : '{% url "talentprofile" talentuser.generaluser.userlink %}',
+        data: {
+          'comment': $('#review').val(),
+          'rating':$("input[name='rating3']:checked").val(),
+          'csrfmiddlewaretoken': '{{csrf_token}}', 
+        },
+        success: (response) => {
+          $('#load-comments').load(document.URL + ' #load-comments>*')
+          $("#msg_div").removeClass("alert-danger").addClass("alert-success");
+          if(response['save_review']){
+            $("#msg_div").removeClass("d-none");
+            $("#msg_text").text(response['save_review']);
+          }
+          if(response['updated_comment']){
+            $("#msg_div").removeClass("d-none");
+            $("#msg_text").text(response['updated_comment']);
+          }
+          if(response['updated_rating']){
+            $("#msg_div").removeClass("d-none");
+            $("#msg_text").text(response['updated_rating']);
+          }
+          if(response['updated_review']){
+            $("#msg_div").removeClass("d-none");
+            $("#msg_text").text(response['updated_review']);
+          }
+        }
+      })
+    })
+
+    const isDesktop = () => {
+      if($(".mobile-profile-box").css("display") === "none"){
+        return true
+      }else{
+        return false
+      }
+    }
+
+    const wantToSocialShare = () => {
+      let socialShare, string;
+      if(isDesktop()){
+        socialShare = $("#socialshare-desktop");
+        string = "#socialshare-desktop"
+      }else{
+        socialShare = $("#socialshare-mobile");
+        string = "#socialshare-mobile"
+      }
+      if(socialShare.hasClass("d-none")){
+        anime({
+          targets: string,
+          translateY: [0,30],
+          opacity: [0,1],
+          begin: () => {
+            socialShare.removeClass("d-none");
+          },
+        });
+      }else{
+        anime({
+          targets: string,
+          translateY: [30,0],
+          opacity: [1,0],
+          complete: () => {
+            socialShare.addClass("d-none");
+          },
+        });
+      }
+    };
+
+
+</script>
+
+{% endblock %}

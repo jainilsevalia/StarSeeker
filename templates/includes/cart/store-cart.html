@@ -1,0 +1,75 @@
+{% load static %}   
+
+{% if items.count > 0 %}
+<div class="row">
+    <div class="col p-4 order-12 order-md-0">
+        <div class="br-15 p-md-4">
+            <h5><strong>Your address</strong></h5>
+            <div class="mt-3">
+                {% include 'includes/address.html' %}
+            </div>
+            <div class="mt-5">
+                <h5><strong>Products' details</strong></h5>
+                <div class="mt-3">
+                    {% for item in items %}
+                        <div class="d-sm-flex align-items-center justify-content-between box-shadow-outset p-3 mb-3 br-15">
+                            <figure class="d-flex align-items-center mb-0" style="column-gap: 1rem;">
+                                <img src="{{ item.product.thumbnail.url }}" class="br-15 object-fit-cover product-thumbnail" />
+                                <figcaption>
+                                    <div><a href="{% url 'product_detail' item.product.slug %}" class="font-weight-bold text-dark">{{ item.product.name }}</a></div>
+                                    <div class="text-muted small">by {{item.product.added_by.name}}</div> 
+                                </figcaption>
+                            </figure>
+                            <div class="d-flex mt-3 mt-sm-0" style="gap: 1rem;" >                                                                                                              
+                                <button data-product="{{item.product.id}}" data-action="remove" class="btns btn-light update-cart"><i class="bi bi-dash-lg"></i></button>
+                                <div>{{ item.quantity }}</div>
+                                <button data-product="{{item.product.id}}" data-action="add" class="btns btn-light update-cart"><i class="bi bi-plus-lg"></i></button>
+                            </div>
+                            <div class="price-wrap mt-3 mt-sm-0"> 
+                                <var class="price">₹ {{ item.product.price|floatformat }}</var> 
+                            </div>	
+                            <div data-product="{{item.product.id}}" data-action="delete" class="d-flex d-sm-block justify-content-end update-cart"><i
+                                    class="bi bi-dash-circle" style="font-size: 1.7em"></i></div>
+                        </div>  
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 p-4 order-0 order-md-12">
+        <div class="box-shadow-outset br-15 p-3">
+            <table class="table table-borderless">
+                <tr>
+                    <th>Total Items</th>
+                    <td>{{ user.store_cart.get_cart_items_count}}</td>
+                </tr>
+                <tr>
+                    <th>Total Quantity</th>
+                    <td>{{ user.store_cart.get_cart_items_quantity}}<td>
+                </tr>
+                <tr>
+                    <th>Total price</th>
+                    <td>₹ {{ user.store_cart.get_cart_total|floatformat}}</td>
+                </tr>
+            </table>    
+            <div class="text-center">
+                <a href="{% url 'checkout' %}" class="btn btn-primary fs-95" id="checkout-btn"> Make Purchase <i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div
+        class="
+        d-flex
+        flex-column
+        justify-content-center
+        align-items-center
+        "
+    >
+    <img src="{% static './img/cart.png' %}" style="max-width: 450px;" />
+    <span>No products in your cart.</span>
+  </div>
+{% endif %}
+<script>
+</script>

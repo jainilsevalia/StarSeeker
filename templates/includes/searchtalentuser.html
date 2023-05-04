@@ -1,0 +1,64 @@
+{% load static %}
+{% load filters %}
+<div class="d-flex justify-content-center">
+  <div class="talent-card-wrapper">
+    {% for tuser in talentusers %}
+    {% if tuser.is_kyc_done == True %}
+      <div class="talent-card">
+        <a href="{% url 'talentprofile' tuser.generaluser.userlink %}">
+          <div class="talent-thumbnail-container">
+          <img
+            src="{% if tuser.thumbnail %}{{ tuser.thumbnail.url }}{% else %}{% static './img/no-thumbnail.jpg' %}{% endif %}"
+            class="talent-thumbnail"
+          />
+        </div>
+        </a>
+        <div class="mt-2 mx-1 d-flex align-items-center">
+          <img
+            src="
+              {% if tuser.generaluser.profile_picture %}
+                  {{ tuser.generaluser.profile_picture.url }}
+              {% else %}
+                  {% static './img/avatar.png' %}
+              {% endif %}
+              "
+            class="rounded-circle talent-img"
+          />
+          <div class="d-flex flex-column px-1 talent-info">
+            <!-- #TODO: Uncomment the below lines to implement fake name functionality. -->
+            {# if request.user.is_authenticated #}
+            <span>{{ tuser.generaluser.name }}</span>
+            {# else #}
+            <!-- <span>{{ tuser.generaluser.name|fake_name }}</span> -->
+            {# endif #}
+            <span>
+              {{ tuser.category }}
+            </span>
+          </div>
+          <div class="d-flex flex-column px-1 talent-info ml-auto">
+            <span
+              ><i class="bi bi-geo-alt"></i>
+              <span> 
+                {% if not tuser.generaluser.address.city.name or not tuser.generaluser.address.state.name %}
+                {{ tuser.generaluser.otherCountry.city }}, {{ tuser.generaluser.otherCountry.state }}
+                {% else %}          
+                {{  tuser.generaluser.address.city.name }}, {{  tuser.generaluser.address.state.name }}
+                {% endif %}
+              </span>
+            </span>
+            <span>
+              {% if tuser.rating_avg != 0 %}
+              <span style="color: rgb(255, 166, 0)"
+                ><i class="bi bi-star-fill"></i>              
+                  {{ tuser.rating_avg|floatformat }}
+              </span>
+              {% endif %}
+              <span style="float: right">₹ {{ tuser.price|floatformat }} </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>

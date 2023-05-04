@@ -1,0 +1,42 @@
+{% extends 'index.html' %}
+{% load static %} 
+{% block content %}
+<div class="container">
+    <div class="mt-5">
+        <div class="text-justify">
+            <p>
+                <strong style="font-size: 1.2em;">Duniya Dekhegi</strong> is a unique platform that empowers and
+                connects all sorts of artists with the right set of
+                audience. It encourages people to pursue alternate skills and become successful with the help of this
+                platform.
+            </p>
+            <p>
+                We encourage people who have skills such as musicians, singers, story-writer, song-writer, mimicry
+                artists,
+                poets, orchestra, and various other forms of art to register with Duniya Dekhegi.
+            </p>
+            <hr>
+            <div class="row">
+                <div class="col-12 col-md-6" >
+                    <div class="d-flex flex-column align-items-center box-shadow-outset h-100 p-3" style="border-radius: 15px;">
+                        <img src="{% static './img/vision.svg' %}" alt="Vision" width="88px">
+                        <div class="h5 font-weight-bold ml-1">Vision</div>
+                        <div class="d-flex align-items-center h-100 text-center">To bridge the gap between the acceptance of art and other forms of alternate
+                            skills in the mainstream
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 mt-3 mt-md-0">
+                    <div class="d-flex flex-column align-items-center box-shadow-outset h-100 p-3" style="border-radius: 15px;">
+                        <img src="{% static './img/mission.svg' %}" alt="Mission" width="100px" style="margin-top: -7px;">
+                        <div class="h5 font-weight-bold">Mission</div>
+                        <div class="d-flex align-items-center h-100 text-center">To help artists reach a wider audience and global acceptance. To promote local
+                            skills and create
+                            harmony among the people with the help of art, music and other forms of art.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

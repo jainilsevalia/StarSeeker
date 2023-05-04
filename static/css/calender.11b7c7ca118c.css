@@ -1,0 +1,21 @@
+#calender td {
+  text-align: center;
+}
+
+.current-date {
+  font-weight: bold;
+  border-radius: 10px;
+  background-color: #5abab7;
+}
+
+.not-available-date {
+  font-weight: bold;
+  color: #dc143c;
+  border-bottom: 3px solid;
+}
+
+.booked-date {
+  font-weight: bold;
+  color: #cc33cc;
+  border-bottom: 3px solid;
+}

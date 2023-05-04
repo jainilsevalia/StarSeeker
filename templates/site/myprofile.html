@@ -1,0 +1,261 @@
+{% extends 'index.html' %}
+{% load static %} 
+{% block content %}
+<div class="container-fluid">
+  <div id="profile-info-container">
+    <div
+      id="profile-info"
+      class="d-flex flex-column flex-md-row align-items-center"
+    >
+      <div class="profile-img-container mr-3 mb-2 position-relative">
+          <svg class="progress-ring">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="50%" x2="100%" y2="50%" >
+                     <stop offset="0%" style="stop-color:rgb(109,100,248);stop-opacity:1.00" />
+                     <stop offset="25%" style="stop-color:rgb(204,51,204);stop-opacity:1.00" />
+                     <stop offset="75%" style="stop-color:rgb(142,0,145);stop-opacity:1.00" />
+                     <stop offset="100%" style="stop-color:rgb(255,162,64);stop-opacity:1.00" />
+               </linearGradient>
+             </defs>
+            <circle cx="110" cy="110" r="100" stroke="url(#gradient)" stroke-dashoffset="calc(650 - (650 * {{user.progress}}) / 100)"></circle>
+          </svg>  
+          <img
+            src="
+            {% if user.profile_picture %}
+              {{ user.profile_picture.url }}
+            {% else %}
+              {% static './img/avatar.png' %}            
+            {% endif %}
+            "
+            class="rounded-circle"
+            width="200px"
+            height="200px"
+          />
+          {% if user.progress != 99 %}
+          <div class="progress-percantage">     
+              {{user.progress}}%
+            </div>
+          {% endif %}   
+      </div>
+      <span class="fs-9">
+        <h2 class="font-weight-bold mb-0 ml-1">
+          <b>{{ user.name }}</b>
+          {% if user.talentuser.is_kyc_done %}
+            <i class="bi bi-patch-check-fill text-primary fs-9"></i>
+          {% endif %}  
+        </h2> 
+        
+        {% if user.talentuser and not user.talentuser.is_kyc_done %} 
+            <span class="badge badge-pill badge-warning mb-2 ml-1">KYC IN PROCESS</span> 
+        {% endif %}    
+        <div class="d-flex flex-column mb-1">
+          <div class="mb-2 d-flex align-items-center">
+            <i class="bi bi-envelope mx-2" style="font-size: 1.4em;margin-top: 1px;"></i>
+            <span>{{ user.email }}</span>
+          </div>
+          {% if user.phone_number %}
+          <div class="mb-1 d-flex align-items-center">
+            <i class="bi bi-telephone mx-2" style="font-size: 1.3em;"></i>
+            <span>{{ user.phone_number }}</span>
+          </div>
+          {% endif %}
+          {% if user.talentuser.id %}
+          <div class="mb-1 d-flex align-items-center">
+            <i class="bi bi-link ml-2 mr-1" style="font-size: 1.6em;"></i>
+            <span><a class="mt-1" href="{% url 'talentprofile' user.userlink %}">{{user.userlink}}</a></span>
+          </div>
+          {% endif %}
+          {% if user.seller %}
+          <div class="mb-2 d-flex align-items-center">
+            <i class="bi bi-shop-window ml-2 mr-2" style="font-size: 1.4em;"></i>
+            <span class="mt-1"><a href="{% url 'personal_store' user.seller.id %}">{{user.seller.store_name}}</a></span>
+            {% if not user.seller.is_kyc_done %}
+            <span class="badge badge-warning mt-1 ml-1">KYC in process</span>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>      
+        <a class="btn btn-primary fs-9" href="{% url 'editprofile' %}">Edit Profile</a>
+      </span>
+    </div>
+  </div>
+  <ul class="nav nav-pill custom-pill mt-4" role="tablist">
+    <!-- {% if user.talentuser %}  
+      <li class="nav-item" >
+        <a
+          class="nav-link"
+          id="collaboration-tab"
+          data-toggle="tab"
+          href="#collaboration"
+          role="tab"
+          aria-controls="collaboration"
+          aria-selected="false"
+          >Collaboration <i class="bi bi-people ml-2" aria-hidden="true"></i></a
+        >
+      </li>
+    {% endif %} -->
+
+    <li class="nav-item" >
+      <a
+        class="nav-link active"
+        id="my-booking-tab"
+        data-toggle="tab"
+        href="#my-booking"
+        role="tab"
+        aria-controls="my-booking"
+        aria-selected="false"
+        >My Bookings</a
+      >
+    </li>
+
+    <li class="nav-item" >
+      <a
+        class="nav-link"
+        id="my-orders-tab"
+        data-toggle="tab"
+        href="#my-orders"
+        role="tab"
+        aria-controls="my-orders"
+        aria-selected="false"
+        >My Orders</a
+      >
+    </li>
+     
+    {% if user.talentuser %}
+    <li class="nav-item" >
+      <a
+        class="nav-link"
+        id="received-booking-tab"
+        data-toggle="tab"
+        href="#received-booking"
+        role="tab"
+        aria-controls="received-booking"
+        aria-selected="false"
+        >Received Bookings</a
+      >
+    </li>
+    {% endif %}
+       
+    
+    {% if user.seller %}
+    <li class="nav-item" >
+      <a
+        class="nav-link"
+        id="received-orders-tab"
+        data-toggle="tab"
+        href="#received-orders"
+        role="tab"
+        aria-controls="received-orders"
+        aria-selected="false"
+        >Received Orders</a
+      >
+    </li>
+    {% endif %}
+  </ul>
+  <div class="tab-content">
+    <!-- No logic right now added -->
+    <div
+      class="tab-pane"
+      id="collaboration"
+      role="tabpanel"
+      aria-labelledby="collaboration-tab"
+    >
+      <br />
+      <br />
+    </div>
+    
+
+    <div
+      class="tab-pane mx-1 mx-sm-3"
+      id="my-booking"
+      role="tabpanel"
+      aria-labelledby="my-booking-tab"
+    >  
+      <div class="d-flex flex-wrap">
+        {% for order in orders %}
+        <div class="receipt mt-3 mx-0 mx-sm-2">
+          <div class="receipt-list h-100">
+            <div class="d-flex flex-column align-items-center font-family-monospace">
+              <h6 class="mb-0">Receipt</h6>
+              <h5 class="font-weight-bold mb-0">₹ {{ order.cart.total_amount }}</h5>
+              <div class="mt-1">{{ order.cart.date_ordered }}</div>
+            </div>
+            {% for item in order.cart.cart_items %}
+            <div class="receipt-item d-flex flex-column">
+              <div class="d-flex">
+                <i id="toggle-{{item.id}}" class="bi bi-caret-down-fill fs-8 text-primary cursor-pointer mr-1" onclick="showMore('{{item.id}}')"></i>
+                <div class="receipt-label">{{item.talentuser.name}}</div>
+                <div class="receipt-value ml-auto">{{item.sub_total}} ₹ </div>
+              </div>
+              <div class="more-info-{{item.id}} mt-2 mb-1 fs-95" style="font-style: italic;display:none">
+                booked for <b>{{ item.event_type }}</b> event with date <b>{{ item.start_date }}</b> for <b>{{ item.number_of_days }}</b> day/s.
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>   
+        {% endfor %} 
+      </div>
+    
+    </div>  
+
+    
+    <!-- No logic right now added -->
+    <div
+      class="tab-pane"
+      id="my-orders"
+      role="tabpanel"
+      aria-labelledby="my-orders-tab"
+    >
+      <br />
+      <br />
+    </div>
+
+    <!-- No logic right now added -->
+    {% if user.talentuser %}
+    <div
+      class="tab-pane"
+      id="received-booking"
+      role="tabpanel"
+      aria-labelledby="received-booking-tab"
+    >
+      <br />
+      <br />
+    </div>
+    {% endif %}
+
+    <!-- No logic right now added -->
+    {% if user.seller %}
+    <div
+      class="tab-pane"
+      id="received-orders"
+      role="tabpanel"
+      aria-labelledby="received-orders-tab"
+    >
+      <br />
+      <br />
+    </div>
+    {% endif %}
+  </div>
+</div>
+<script type="text/javascript">
+  const hash = location.hash.replace(/^#/, '');
+  if (hash) {
+      $('.nav-pill a[href="#' + hash + '"]').tab('show');
+  } 
+
+  const showMore = (id) => {
+    if($(".more-info-"+id).css("display") === "none"){
+      $("#toggle-"+id).addClass("bi-caret-up-fill").removeClass("bi-caret-down-fill");
+      $(".more-info-"+id).slideDown("fast");
+    }else{
+      $("#toggle-"+id).addClass("bi-caret-down-fill").removeClass("bi-caret-up-fill");
+      $(".more-info-"+id).slideUp("fast");
+    }
+  }
+</script>
+
+
+{% endblock %}
+
+

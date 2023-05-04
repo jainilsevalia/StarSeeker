@@ -1,0 +1,21 @@
+{
+    "name": "DuniyaDekhegi",
+    "short_name": "DuniyaDekhegi",
+    "description": "DuniyaDekhegi is a unique platform that empowers and connects all sorts of artists with the right set of audience.",
+    "start_url": "https://www.duniyadekhegi.com/",
+    "icons": [
+        {
+            "src": "https://partypakkis3bucket.s3.amazonaws.com/duniyadekhegi/dd_static/favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://partypakkis3bucket.s3.amazonaws.com/duniyadekhegi/dd_static/favicon/android-chrome-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "display": "standalone"
+}

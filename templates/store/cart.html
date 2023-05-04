@@ -1,0 +1,494 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block style %}
+<style>
+    .card-input-element {
+        display: none;
+    }
+
+    .card-input {
+        
+        padding: 10px;
+    }
+
+    .card-input:hover {
+        cursor: pointer;
+    }
+
+    .card-input-element:checked + .card-input {
+        border-radius:5px;
+        box-shadow: 0 0 2px 2px #2ecc71;
+    }
+    
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-fluid" id="cart-page-container">
+    <ul class="nav nav-pill custom-pill mt-4" role="tablist"> 
+        <li class="nav-item" >
+        <a
+            class="nav-link active"
+            id="product_cart-tab"
+            data-toggle="tab"
+            href="#product_cart"
+            role="tab"
+            aria-controls="product_cart"
+            aria-selected="true"
+            >Products Cart <i class="fa fa-shopping-bag ml-2"></i>
+        </a>
+        </li>
+        <li class="nav-item" >
+        <a
+            class="nav-link"
+            id="artist-cart-tab"
+            data-toggle="tab"
+            href="#artist-cart"
+            role="tab"
+            aria-controls="artist-cart"
+            aria-selected="false"
+            >Artist Booked <i class="fa fa-users ml-2" aria-hidden="true"></i>
+        </a>
+        </li>          
+    </ul>
+    <br/>
+    <div class="tab-content">
+        <div class="tab-pane active" id="product_cart" role="tabpanel" aria-labelledby="product_cart-tab">
+            <section class="section-content padding-y" style="padding-top: 30px;
+                margin: 0;  font-family: "Inter",Arial,"Helvetica Neue","Segoe UI",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+                font-size: 1rem;  font-weight: 400; line-height: 1.5; color: #212529; text-align: left; background-color: #fff;mpadding-bottom: 30px;">
+                <div class="container-fluid" style="margin-left:5%;margin-right:2%">
+                    {% if items %}
+                        <div class="row">
+                        <main class="col-md-8">
+                            <div class="box-element" id="form-wrapper">
+                                <form id="address-form">    {% csrf_token %}
+                                    <input type="hidden" value="{{ order.get_cart_total }}" name="total">
+                                    {% if not request.user.is_authenticated %}
+                                    <div id="shipping-info">
+                                        <p>Shipping Information:</p>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="name" placeholder="Name...">
+                                        </div>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="email" placeholder="Email address...">
+                                        </div>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="address" placeholder="Address...">
+                                        </div>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="city" placeholder="City...">
+                                        </div>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="state" placeholder="State...">
+                                        </div>
+                                        <div class="form-field">
+                                            <input required class="form-control" type="text" name="pincode" placeholder="Pincode...">
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="address-info">
+                                        <p>Select Address:</p>
+                                        <div  style="margin-top:10px;" class="col address-card p-3 fs-9 d-flex flex-column mb-3 mr-3">
+                                            {% for address in addresses2 %}
+                                            <div class="row-md-4 row-lg-4 row-sm-4">
+                                                <label style="width:100%; background-color:#EEEEEE; border-radius:5px;">
+                                                        <input required type="radio" class="card-input-element" name="address" value="{{address.id}}"/>
+                                                    <div class="panel panel-default card-input" >
+                                                    <!-- <div class="panel-heading">{{address.generaluser.name}}, {{address.email}}</div> -->
+                                                    <div class="panel-body">
+                                                        {{address.address}}, {{address.city.name}}<br/>
+                                                        {{address.state.name}} - {{address.pincode}}.
+                                                    </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>                                
+                        </main>
+                        <aside class="col-md-3">
+                            <div class="card" style="border-radius:20px;">
+                                <div class="card-body" >
+                                    <div style="display:grid;grid-template-columns:70% 30%;">
+                                        <div><p><b>Total Items</p>
+                                            <p>Total Quantity</p>
+                                            <p>Total price</b></p>
+                                        </div>
+                                        <div>
+                                            <p>{{order.get_cart_items_count}}</p>
+                                            <p>{{ order.get_cart_items_quantity}}<p>
+                                            <p>₹ {{order.get_cart_total|floatformat}}</p>
+                                        </div>
+                                    </div>    
+                                   
+                                    <hr>
+                                    <p class="text-center mb-3">
+                                        <img src="{% static 'imgs/rupay_card.jpg' %}" height="26">
+                                    </p> 
+                                </div> <!-- card-body.// -->
+                            </div>  <!-- card .// -->
+                        </aside> <!-- col.// -->
+                        </div>
+                        <div class="row" id="row3">
+                            <main class="col-md-8" id="cart-card">
+                                <div class="card" style="padding:2%; border-radius: 25px;">
+                                    <table class="table table-borderless table-shopping-cart">
+                                        <thead class="text-muted">
+                                        <tr class="small text-uppercase">
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col"> </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in items %}
+                                        <tr>
+                                            <td>
+                                                <figure class="item" style="display:grid; grid-template-columns:40% 50%;" id="cartitem-col">
+                                                    <div><img src="{{ item.product.thumbnail.url }}" class="talent-thumbnail" id="product-img-cart" style=" width:150px; height:150px;" ></div>
+                                                    <div><figcaption class="info" style="padding-top:5%;">
+                                                        <p><a href="#" class="title text-dark">{{ item.product.name }}</a>
+                                                        <p class="text-muted small">-by {{item.product.added_by.name}}</p> 
+                                                        </figcaption>
+                                                    </div>
+                                                </figure>
+                                            
+                                            </td>
+                                            <td> 
+                                                    <div style="display:grid;grid-template-columns:30% 15% 30%" id="quantity-col">                                                                                                              
+                                                            <div><button data-product="{{item.product.id}}" data-action="remove" class="btns btn-light update-cart"> <i class="fa fa-minus"></i></button></div>
+                                                            <div style="margin:2%;">{{ item.quantity }}</div>
+                                                            <div><button data-product="{{item.product.id}}" data-action="add" class="btns btn-light update-cart"> <i class="fa fa-plus"></i></button></div>
+                                                    </div>	
+                                            </td>
+                                            <td> 
+                                                <div class="price-wrap"> 
+                                                    <var class="price">₹ {{ item.product.price|floatformat }}</var> 
+                                                </div> <!-- price-wrap .// -->
+                                            </td>
+                                            <td class="text-right"> 
+                                            <!-- <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip"> <i class="fa fa-heart"></i></a>  -->
+                                            <button data-product="{{item.product.id}}" data-action="delete" class="btn btn-light update-cart"> Remove</button>
+                                            </td>
+                                            
+                                        </tr>
+                                        
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                
+                                    <div class="card-body border-top">
+                                        <a href="{% url 'checkout' %}" class="btn btn-primary float-md-right" id="checkout-btn"> Make Purchase <i class="fa fa-chevron-right"></i> </a>
+                                        <a href="{% url 'store' %}" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
+                                    </div>	
+                                </div> <!-- card.// -->
+
+                                <div class="alert alert-success mt-3">
+                                    <p class="icontext"><i class="icon text-success fa fa-truck"></i> Free Delivery within 1-2 weeks</p>
+                                </div>
+                            </main>
+                        
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>
+                                    No products added to cart yet. Go to <a class="link" href="{%url 'store'%}">store</a>.
+                                </h4>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div> <!-- container .//  -->
+            </section>
+        </div>   
+      
+        <div  class="tab-pane"  id="artist-cart"  role="tabpanel" aria-labelledby="artist-cart-tab">     
+         <div>
+            <div
+                class="d-flex flex-column justify-content-center align-items-center bg-gray p-3">
+                <h3><b>Your cart</b></h3>
+                <span>Book talentuser on Duniya Dekhegi</span>
+            </div>
+            {% if cartitems.count > 0 %}
+            <div class="row mt-5">
+                <div class="col-lg-8 col-md-7">
+                <div class="row mx-5 mr-md-0">
+                    <div class="col-lg-4 mb-2 mb-md-0">
+                    <h5><b>Talentuser details</b></h5>
+                    </div>
+                    <div id="talentuser-details" class="col-lg-8">
+                    {% for item in cartitems %}
+                    <div class="mb-4">
+                        <div class="hr-simple mb-3">
+                        <b>Fill details for</b>
+                        <span
+                            class="font-family-cursive color-purple"
+                            style="font-size: 1.4em"
+                            >{{ item.talentuser.generaluser.name }}</span
+                        >
+                        </div>
+                        <div>
+                        <div class="row">
+                            <div class="col">
+                            <input
+                                type="text"
+                                id="{{ item.talentuser.generaluser.userlink }}-event-date"
+                                class="form-control event-date-selector"
+                                placeholder="Event Date"
+                            />
+                            </div>
+                            <div class="col">
+                            <input
+                                type="text"
+                                id="{{ item.talentuser.generaluser.userlink }}-event-type"
+                                class="form-control"
+                                placeholder="Event Type"
+                            />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col box-selectpicker">
+                            <select
+                                id="{{ item.talentuser.generaluser.userlink }}-slot-of-the-day"
+                                class="selectpicker form-control"
+                                title="Slot of the day"
+                            >
+                                <option>Morning</option>
+                                <option>Afternoon</option>
+                                <option>Evening</option>
+                                <option>Night</option>
+                            </select>
+                            </div>
+                            <div class="col">
+                            <input
+                                type="text"
+                                id="{{ item.talentuser.generaluser.userlink }}-no-of-days"
+                                class="form-control no-of-days"
+                                placeholder="No. of days"
+                                onchange="changeTotal(event)"
+                            />
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <input type="hidden" class="talentuser-userlink" value='{{item.talentuser.generaluser.userlink}}'>
+                    {% endfor %}
+                    </div>
+                </div>
+                <div class="row mx-5 mr-md-0">
+                    <div class="col-lg-4 my-2 mb-md-0">
+                    <h5><b>Personal details</b></h5>
+                    </div>
+                    <div class="col-lg-8">
+                    {% include 'includes/address.html' %}
+                    </div>
+                </div>
+                </div>
+                <div class="col-lg-4 col-md-5 mt-5 mt-md-0">
+                <div class="row mx-5 mx-md-0">
+                    <div class="col">
+                    <h5 class="mb-2"><b>Order summary</b></h5>
+                    <div id="order-summary" class="mr-0 mr-lg-2 mr-xl-5 p-3">
+                        {% for item in cartitems %}
+                        <div class="d-flex align-items-center mb-3">
+                        <img
+                            src="
+                            {% if item.talentuser.generaluser.profile_picture %}
+                            {{ item.talentuser.generaluser.profile_picture.url }}
+                            {% else %}
+                            {% static './img/avatar.png' %}  
+                            {% endif %}
+                            "
+                            width="75px"
+                            height="75px"
+                            class="rounded-circle mx-1 profile-img"
+                        />
+                        <div class="d-flex flex-column ml-1">
+                            <span><b>{{ item.talentuser.generaluser.name }}</b></span>
+                            <small style="margin-left: 1px"
+                            >{{ item.talentuser.category }}</small
+                            >
+                            <span id="{{ item.talentuser.generaluser.userlink }}-price" class="mt-1 price"
+                            ><b>₹ {{ item.talentuser.price }}</b> <small>/ day </small> </span
+                            >
+                            <input type="hidden" id="{{ item.talentuser.generaluser.userlink }}-input-price" class="price-input" value="{{ item.talentuser.price }}">
+                        </div>
+                        <span
+                            class="ml-auto"
+                            onclick="removeItemFromCart('{{item.talentuser.generaluser.userlink}}')"
+                            ><i class="bi bi-dash-circle" style="font-size: 1.7em"></i
+                        ></span>
+                        </div>
+                        {% endfor %}
+                        <div class="hr-simple my-3"></div>
+                        <div class="d-flex justify-content-between mx-1">
+                        <span><b>Total:</b></span>
+                        <span id="total-amount">₹ {{ user.user_cart.cart_total }}</span>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-center">
+                        <button class="submit-button state-0" onclick="sendBookingRequest()">
+                            <span class="pre-state-msg">Submit</span
+                            ><span class="current-state-msg hide">Sending...</span
+                            ><span class="done-state-msg hide">Done!</span>
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            {% else %}
+            <div
+                class="d-flex flex-column justify-content-center align-items-center">
+                <img src="{% static './img/cart.png' %}" style="max-width: 450px;" />
+                <span>Your cart is empty.</span>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>    
+</div>
+  
+{% endblock content %}
+{% block script %}
+<script type="text/javascript">
+    document.getElementById('checkout-btn').addEventListener('click', function(e){
+        e.preventDefault()
+        $.ajax({
+            type:"POST",
+            url:"{% url 'checkout' %}",
+            data: $("#address-form").serialize(),
+            success:function(resp){
+                // cart = {}
+                // document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/"
+                // alert('Transaction Completed.')
+                window.location.href = "{% url 'checkout' %}"
+            }
+        })
+    })
+</script>
+
+<script src="{% static './js/sendbutton.js' %}"></script>
+<script>
+  //FOR NUMBER INPUT FIELD
+  $('.no-of-days').on('paste', function (event) {
+    if (event.originalEvent.clipboardData.getData('Text').match(/[^\d]/)) {
+      event.preventDefault();
+    }
+  });
+
+  $(".no-of-days").on("keypress",function(event){
+    if(event.which < 48 || event.which >58){
+        return false;
+    }
+  });
+
+  const convertDate = (inputFormat) => {
+    const pad = (s) => { return (s < 10) ? '0' + s : s; };
+    let d = new Date(inputFormat);
+    return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('-');
+  }
+
+  const datepickerInputs = document.querySelectorAll(".event-date-selector");
+  const dateFormat = 'yyyy-mm-dd'
+  let datepickers = [];
+  for (let i = 0; i < datepickerInputs.length; i++) {
+    datepickers[i] = new Datepicker(datepickerInputs[i], {
+      format: dateFormat,
+      minDate: convertDate(dateFormat),
+      todayHighlight: true
+    });
+  }
+  
+  const changeTotal = (e) => {
+    const talentuser = e.target.id.replace("-no-of-days","");
+    const price = parseFloat($(`#${talentuser}-input-price`).val());
+    if(e.target.value.trim() && e.target.value !== '0'){
+      $(`#${talentuser}-price`).html(`<b>₹ ${(price * e.target.value).toString()}</b> <small>/${e.target.value === '1' ? '' : e.target.value} day </small> `);
+    }else{
+      $(`#${talentuser}-price`).html(`<b>₹ ${(price).toString()}</b> <small>/ day </small> `);
+      $("#total-amount").html(`₹ {{ user.user_cart.cart_total }}`);
+    }
+    const priceArrayEle = $(".price b");
+    let priceArray = [...priceArrayEle.map((index,element) => element.innerText.substring(2) )]; 
+    let totalAmount = 0;
+    priceArray.forEach(price => {
+      totalAmount += parseFloat(price);
+    });
+    $("#total-amount").html(`₹ ${totalAmount}`);
+  }
+
+  const sendBookingRequest = () => {
+    const arrayOfTalentUser = [...document.querySelectorAll(".talentuser-userlink")].map(data => data.value);
+    let talentusersDetails = {};
+    arrayOfTalentUser.forEach(tuser => {
+      const event_date = document.querySelector(`#${tuser}-event-date`).value;
+      const event_type = document.querySelector(`#${tuser}-event-type`).value;
+      const slot_of_the_day = document.querySelector(`#${tuser}-slot-of-the-day`).value;
+      const no_of_days = document.querySelector(`#${tuser}-no-of-days`).value;
+
+      talentusersDetails[tuser] = {
+        event_date,
+        event_type,
+        slot_of_the_day,
+        no_of_days,
+      }
+    })
+    talentusersDetails = JSON.stringify(talentusersDetails)
+    const state = document.querySelector("#user-state").value;
+    const city = document.querySelector("#user-city").value;
+    const pincode = document.querySelector("#user-pincode").value;
+    const address = document.querySelector("#user-address").value;
+   
+
+    const personalDetails = JSON.stringify({
+      state,
+      city,
+      pincode,
+      address
+    })
+    const total_amount = $("#total-amount").text().substring(2);
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart' %}",
+      data: {
+        talentusersDetails,
+        personalDetails,
+        total_amount,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+      },
+      success: (response) => {
+        if(response["success"]){
+          setTimeout(() => {
+            location.href = "/user/myprofile/#booking"
+          }, 3500);
+        }
+      }
+    });
+  } 
+
+  const removeItemFromCart = (tuserlink) => {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart' %}",
+      data: {
+        tuserlink: tuserlink,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      success: (response) => {
+        if (response["success"]) {
+          location.reload();
+        }
+      },
+    });
+  };
+
+  $("#user-address").val("{{user.address.address}}")
+  $("#user-city").val("{{user.address.city}}")
+  $("#user-state").val("{{user.address.state}}")
+  $("#user-pincode").val("{{user.address.pincode}}")
+</script>
+{% endblock %}

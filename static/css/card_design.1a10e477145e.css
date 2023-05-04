@@ -1,0 +1,80 @@
+@media (max-width:764px) {
+    #profile-tab-store{
+        display:flex;
+        flex-direction: row!important;
+    }
+    #profile-tabe-store-col1{
+        flex-direction: column!important;
+        width: 80%!important;
+    }
+    #profile-tabe-store-col2{
+        flex-direction: column!important;
+        width: 150%!important;
+    }
+    #profile-img-circle {
+        width:90px !important;
+    }
+    #view-profile-btn{
+        display: none;
+    }
+    #genheading{
+        font-size: 15px !important;
+    }
+    #social-icon-store{
+        float: left !important;
+    }
+    #social-icon{
+        
+        height: 22px !important;
+    } 
+    
+}
+@media (max-width:850px) {
+    #products-list{
+        display: grid !important;
+        grid-template-rows: auto !important;
+    }
+    .talent-card{
+        width: 100% !important;
+        padding-right: 5% !important;
+        padding-left: 5% !important;
+    }
+    #cart-page-container{
+        width: auto !important;
+        margin: 5% !important;
+    }
+}
+
+@media only screen and (min-width:851px) and (max-width:995px){
+    #products-list{
+        display: grid !important;
+        grid-template-columns: 50% 50% !important;
+        padding-left: 5% ;
+        padding-right: 5%;
+        justify-content: center;
+    }
+    .talent-card{
+        width: 100% !important;
+        padding-right: 5% !important;
+        padding-left: 5% !important;
+    }
+    #product-img{
+        width: 270px !important;
+        height: 250px !important;
+        }
+}
+
+@media only screen and (min-width:530px) and (max-width:1091px){
+    #card-cart{
+        width:auto;
+    }
+    #cartitem-col{
+        display: flex !important;
+        flex-shrink: 3;
+    }
+    #product-img-cart{
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+

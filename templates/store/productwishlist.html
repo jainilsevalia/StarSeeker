@@ -1,0 +1,143 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+  <div class="container">
+    <section class="padding-bottom">
+      <!-- <header class="section-heading mb-4">
+          <h3 class="title-section">{{ user.name }}'s Wishlist</h3> 
+      </header> -->
+      <div class="container">
+        <ul class="nav nav-pill custom-pill mt-4" role="tablist">
+          <li class="nav-item" >
+            <a
+              class="nav-link active"
+              id="wishlist-tab"
+              data-toggle="tab"
+              href="#wishlist"
+              role="tab"
+              aria-controls="wishlist"
+              aria-selected="true"
+              >Wishlist <i class="bi bi-heart ml-2"></i>
+            </a>
+          </li>
+          <li class="nav-item" >
+            <a
+              class="nav-link"
+              id="artist-wishlist-tab"
+              data-toggle="tab"
+              href="#artist-wishlist"
+              role="tab"
+              aria-controls="artist-wishlist"
+              aria-selected="false"
+              >Artist Wishlist <i class="bi bi-people ml-2" aria-hidden="true"></i>
+            </a>
+          </li>          
+        </ul>
+        <br />
+        <div class="tab-content">
+          <div
+            class="tab-pane active"
+            id="wishlist"
+            role="tabpanel"
+            aria-labelledby="wishlist-tab">  
+              <div class="product-cards my-3" id="products-list">
+                {% for product in wishlistproducts %}
+                <div class="product-card box-shadow-outset br-20 p-3">
+                  <div onclick="location.href='/store/p/{{product.slug}}/'" class="cursor-pointer">
+                    {% if product.isVideoThumbnail %}
+                    <video src="{{ product.thumbnail.url }}" class="object-fit-cover br-20 aspect-ratio-1 w-100" autoplay loop></video>
+                    {% else %}
+                    <img class="object-fit-cover br-20 aspect-ratio-1" src="{{ product.thumbnail.url }}" width="100%" />
+                    {% endif %}
+                  </div>
+              
+                  <div class="px-2 mt-2">
+                    <div class="fs-9"><strong style="color: grey;text-transform: uppercase;">{{ product.category }}</strong></div>
+                    <div>
+                      <strong>{{ product.name }}</strong>
+                      <strong class="float-right">⭐ {{ product.rating }}</strong>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between">
+                      <h5 class="pt-2"><strong>₹ {{ product.price }}</strong></h5>
+                      <div class="d-flex" style="gap: 10px;">
+                        <div class="circle-icon bg-darkbluegray bg-hover-blue update-cart" data-product={{product.id}} data-action="add" style="font-size: 1.4em;width: 40px;height: 40px"><i class="bi bi-cart-plus"></i>
+                        </div>
+                        <div x-data="{id: {{ product.id }}}" @click="removeFromWishlist(id)"
+                          class="circle-icon bg-red text-white"
+                          style="font-size: 1.3em;width: 40px;height: 40px"><i class="bi bi-heart mt-1"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+          </div>   
+          <div
+            class="tab-pane"
+            id="artist-wishlist"
+            role="tabpanel"
+            aria-labelledby="artist-wishlist-tab">     
+            <div id="profile-card-container" class="mt-3 mx-2 d-flex flex-wrap
+              {% if wishlist_profiles|length >= 4 %}
+                justify-content-center
+              {% else %}
+                justify-content-start
+              {% endif %}" >
+              {% for wp in wishlist_profiles %}
+                <span class="profile-card">  
+                  <span class="ml-auto" onclick="removeFromWishlist('{{wp.wishlist_profile.id}}')"><i class="bi bi-x-circle"></i></span>
+                  <a href="{% url 'talentprofile' wp.wishlist_profile.generaluser.userlink %}" class="text-reset text-decoration-none profile-card-content">
+                    <div class="profile-card-thumb-container">
+                      <img
+                        src="{% if wp.wishlist_profile.generaluser.profile_picture %}{{ wp.wishlist_profile.generaluser.profile_picture.url }}
+                        {% else %}{% static './img/avatar.png' %}{% endif %}"
+                        class="profile-card-thumbnail rounded-circle"
+                        width="120px"
+                      />
+                    </div>
+                    <div class="mt-2 text-center font-weight-bold">{{ wp.wishlist_profile.generaluser.name }}</div>
+                    <div class="text-center">
+                      <span class="fs-85">
+                        <span style="color: rgb(255, 166, 0)">
+                          <i class="bi bi-star-fill"></i> 5.0
+                        </span>
+                        {{ wp.wishlist_profile.category }}
+                      </span>
+                    </div>
+                    <div class="text-center fs-85"><i class="bi bi-geo-alt"></i> {{ wp.wishlist_profile.city }}, {{ wp.wishlist_profile.state }}</div>
+                    <div class="hr-simple mt-2 text-center"></div>
+                    <div class="mt-2 fs-85 text-center font-weight-bold">Starting at ₹ {{ wp.wishlist_profile.price }}/-</div>
+                  </a>
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>  
+    </section>
+  </div>  
+  <script>
+    const removeFromWishlist = (pid) => {
+      $.post('/store/add_to_wishlist/',{
+          pid,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+      },
+      (res) => {
+          $("#products-list").load(location.href+" #products-list>*","")
+          Toastify({
+            text: res["msg"],
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            style: {
+              borderRadius: "20px"
+            },
+            stopOnFocus: true,
+          }).showToast();
+      }) 
+    }
+  </script>
+{% endblock %}

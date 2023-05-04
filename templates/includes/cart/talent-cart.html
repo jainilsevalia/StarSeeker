@@ -1,0 +1,272 @@
+{% load static %} 
+
+{% if cartitems.count > 0 %}
+  <div class="row mt-5">
+    <div class="col-lg-8 col-md-7">
+      <div class="row mx-5 mr-md-0">
+        <div class="col-lg-4 mb-2 mb-md-0">
+          <h5><b>Talentuser details</b></h5>
+        </div>
+        <div id="talentuser-details" class="col-lg-8">
+          {% for item in cartitems %}
+          <div class="mb-4">
+            <div class="hr-simple mb-3">
+              <b>Fill details for</b>
+              <span
+                class="font-family-cursive color-purple"
+                style="font-size: 1.4em"
+                >{{ item.talentuser.generaluser.name }}</span
+              >
+            </div>
+            <div>
+              <div class="row">
+                <div class="col">
+                  <input
+                    type="text"
+                    id="{{ item.talentuser.generaluser.userlink }}-event-date"
+                    class="form-control event-date-selector"
+                    placeholder="Event Date"
+                  />
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    id="{{ item.talentuser.generaluser.userlink }}-event-type"
+                    class="form-control"
+                    placeholder="Event Type"
+                  />
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col box-selectpicker">
+                  <select
+                    id="{{ item.talentuser.generaluser.userlink }}-slot-of-the-day"
+                    class="selectpicker form-control"
+                    title="Slot of the day"
+                  >
+                    <option>Morning</option>
+                    <option>Afternoon</option>
+                    <option>Evening</option>
+                    <option>Night</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <input
+                    type="text"
+                    id="{{ item.talentuser.generaluser.userlink }}-no-of-days"
+                    class="form-control no-of-days"
+                    placeholder="No. of days"
+                    onchange="changeTotal(event)"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" class="talentuser-userlink" value='{{item.talentuser.generaluser.userlink}}'>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row mx-5 mr-md-0">
+        <div class="col-lg-4 my-2 mb-md-0">
+          <h5><b>Personal details</b></h5>
+        </div>
+        <div class="col-lg-8">
+          {% include 'includes/address.html' %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-5 mt-5 mt-md-0">
+      <div class="row mx-5 mx-md-0">
+        <div class="col">
+          <h5 class="mb-2"><b>Order summary</b></h5>
+          <div id="order-summary" class="mr-0 mr-lg-2 mr-xl-5 p-3">
+            {% for item in cartitems %}
+            <div class="d-flex align-items-center mb-3">
+              <img
+                src="
+                  {% if item.talentuser.generaluser.profile_picture %}
+                  {{ item.talentuser.generaluser.profile_picture.url }}
+                  {% else %}
+                  {% static './img/avatar.png' %}  
+                  {% endif %}
+                  "
+                width="75px"
+                height="75px"
+                class="rounded-circle mx-1 profile-img"
+              />
+              <div class="d-flex flex-column ml-1">
+                <span><b>{{ item.talentuser.generaluser.name }}</b></span>
+                <small style="margin-left: 1px"
+                  >{{ item.talentuser.category }}</small
+                >
+                <span id="{{ item.talentuser.generaluser.userlink }}-price" class="mt-1 price"
+                  ><b>₹ {{ item.talentuser.price }}</b> <small>/ day </small> </span
+                >
+                <input type="hidden" id="{{ item.talentuser.generaluser.userlink }}-input-price" class="price-input" value="{{ item.talentuser.price }}">
+              </div>
+              <span
+                class="ml-auto"
+                onclick="removeItemFromCart('{{item.talentuser.generaluser.userlink}}')"
+                ><i class="bi bi-dash-circle" style="font-size: 1.7em"></i
+              ></span>
+            </div>
+            {% endfor %}
+            <div class="hr-simple my-3"></div>
+            <div class="d-flex justify-content-between mx-1">
+              <span><b>Total:</b></span>
+              <span id="total-amount">₹ {{ user.user_cart.cart_total }}</span>
+            </div>
+            <div class="mt-4 d-flex justify-content-center">
+              <button class="submit-button state-0" onclick="sendBookingRequest()">
+                <span class="pre-state-msg">Submit</span
+                ><span class="current-state-msg hide">Sending...</span
+                ><span class="done-state-msg hide">Done!</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div
+    class="
+      d-flex
+      flex-column
+      justify-content-center
+      align-items-center
+    "
+  >
+    <img src="{% static './img/cart.png' %}" style="max-width: 450px;" />
+    <span>No talentusers in your cart.</span>
+  </div>
+{% endif %}
+
+<script src="{% static './js/sendbutton.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+
+  const typed = new Typed("#cartTaglines", {
+    strings: ["Buy various products...","Book talentusers..."],
+    showCursor: false,
+    typeSpeed: 100
+  });
+
+  //FOR NUMBER INPUT FIELD
+  $('.no-of-days').on('paste', function (event) {
+    if (event.originalEvent.clipboardData.getData('Text').match(/[^\d]/)) {
+      event.preventDefault();
+    }
+  });
+
+  $(".no-of-days").on("keypress",function(event){
+    if(event.which < 48 || event.which >58){
+        return false;
+    }
+  });
+
+  const convertDate = (inputFormat) => {
+    const pad = (s) => { return (s < 10) ? '0' + s : s; };
+    let d = new Date(inputFormat);
+    return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('-');
+  }
+
+  const datepickerInputs = document.querySelectorAll(".event-date-selector");
+  const dateFormat = 'yyyy-mm-dd'
+  let datepickers = [];
+  for (let i = 0; i < datepickerInputs.length; i++) {
+    datepickers[i] = new Datepicker(datepickerInputs[i], {
+      format: dateFormat,
+      minDate: convertDate(dateFormat),
+      todayHighlight: true
+    });
+  }
+  
+  const changeTotal = (e) => {
+    const talentuser = e.target.id.replace("-no-of-days","");
+    const price = parseFloat($(`#${talentuser}-input-price`).val());
+    if(e.target.value.trim() && e.target.value !== '0'){
+      $(`#${talentuser}-price`).html(`<b>₹ ${(price * e.target.value).toString()}</b> <small>/${e.target.value === '1' ? '' : e.target.value} day </small> `);
+    }else{
+      $(`#${talentuser}-price`).html(`<b>₹ ${(price).toString()}</b> <small>/ day </small> `);
+      $("#total-amount").html(`₹ {{ user.user_cart.cart_total }}`);
+    }
+    const priceArrayEle = $(".price b");
+    let priceArray = [...priceArrayEle.map((index,element) => element.innerText.substring(2) )]; 
+    let totalAmount = 0;
+    priceArray.forEach(price => {
+      totalAmount += parseFloat(price);
+    });
+    $("#total-amount").html(`₹ ${totalAmount}`);
+  }
+
+  const sendBookingRequest = () => {
+    const arrayOfTalentUser = [...document.querySelectorAll(".talentuser-userlink")].map(data => data.value);
+    let talentusersDetails = {};
+    arrayOfTalentUser.forEach(tuser => {
+      const event_date = document.querySelector(`#${tuser}-event-date`).value;
+      const event_type = document.querySelector(`#${tuser}-event-type`).value;
+      const slot_of_the_day = document.querySelector(`#${tuser}-slot-of-the-day`).value;
+      const no_of_days = document.querySelector(`#${tuser}-no-of-days`).value;
+
+      talentusersDetails[tuser] = {
+        event_date,
+        event_type,
+        slot_of_the_day,
+        no_of_days,
+      }
+    })
+    talentusersDetails = JSON.stringify(talentusersDetails)
+    const state = document.querySelector("#user-state").value;
+    const city = document.querySelector("#user-city").value;
+    const pincode = document.querySelector("#user-pincode").value;
+    const address = document.querySelector("#user-address").value;
+   
+
+    const personalDetails = JSON.stringify({
+      state,
+      city,
+      pincode,
+      address
+    })
+    const total_amount = $("#total-amount").text().substring(2);
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart' %}",
+      data: {
+        talentusersDetails,
+        personalDetails,
+        total_amount,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+      },
+      success: (response) => {
+        if(response["success"]){
+          setTimeout(() => {
+            location.href = "/user/myprofile/#booking"
+          }, 3500);
+        }
+      }
+    });
+  } 
+
+  const removeItemFromCart = (tuserlink) => {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart' %}",
+      data: {
+        tuserlink: tuserlink,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      success: (response) => {
+        if (response["success"]) {
+          location.reload();
+        }
+      },
+    });
+  };
+
+  $("#user-address").val("{{user.address.address}}")
+  $("#user-city").val("{{user.address.city}}")
+  $("#user-state").val("{{user.address.state}}")
+  $("#user-pincode").val("{{user.address.pincode}}")
+</script>

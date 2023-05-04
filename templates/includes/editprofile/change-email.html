@@ -1,0 +1,74 @@
+<div class="fs-9">
+    <div class="form-group w-75">
+      <label for="email">Email address</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        value="{{ user.email }}"
+      />
+    </div>
+    <div
+      id="email-update-alert"
+      class="d-none alert alert-success fade show w-75"
+      role="alert"
+    >
+      Your email has been updated (if any changes)
+    </div>
+    <div
+      id="email-error-alert"
+      class="d-none alert alert-danger fade show w-75"
+      role="alert"
+    ></div>
+    <button class="btn btn-primary fs-1" onclick="changeEmail()">
+      Change email
+    </button>
+    <div>
+      <hr />
+      <h4>Delete you account</h4>
+      <p class="fs-95">
+        This will permanently delete your account and account data
+      </p>
+      <!-- <input
+        type="text"
+        class="form-control w-75 mb-3"
+        id="delete-account-input"
+        placeholder="Enter your password"
+      /> -->
+      <div
+        id="delete-account-alert"
+        class="d-none alert alert-success fade show w-75"
+        role="alert"
+      >
+        An email has been sent to you to confirm your delete request.
+      </div>
+      <button class="btn btn-important fs-1" onclick="deleteAccount()">
+        Delete
+      </button>
+    </div>
+  </div>
+
+<script type="text/javascript">
+    const changeEmail = () => {
+    const successAlert = document.querySelector("#email-update-alert");
+    const errorAlert = document.querySelector("#email-error-alert");
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        email: $("#email").val(),
+      },
+      success: (response) => {
+        if (response["success"]) {
+          successAlert.classList.remove("d-none");
+          errorAlert.classList.add("d-none");
+        } else {
+          errorAlert.classList.remove("d-none");
+          errorAlert.innerHTML = response["error"];
+          successAlert.classList.add("d-none");
+        }
+      },
+    });
+  };
+</script>

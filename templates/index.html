@@ -1,0 +1,161 @@
+{% load static %} 
+{% load pwa %} 
+{% block html %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2KWXX6P3HR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "");
+    </script>
+
+    <!-- FAVICON RELATED  -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static './favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static './favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static './favicon/favicon-16x16.png' %}">
+    <link rel="mask-icon" href="{% static './favicon/safari-pinned-tab.svg' %}" color="#5bbad5">
+    {% progressive_web_app_meta %}
+    <!-- TITLE  -->
+    <title>{% block title %}Duniya Dekhegi{% endblock %}</title>
+    <!-- STYLES  -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker-bs4.min.css">
+    <link rel="stylesheet" href="{% static './css/style.css' %}" />
+    <link rel="stylesheet" href="{% static './css/calender.css' %}" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    {% if request.path == '/cart/' or request.path == '/survey/' %}
+    <link rel="stylesheet" href="{% static './css/sendbutton.css' %}" />
+    {% endif %} 
+    
+    {% if "/user/deleteaccount/" in request.path %}
+    <link rel="stylesheet" href="{% static './css/pullee.css' %}" />
+    {% endif %}
+    <!-- BOOTSTRAP SELECT  -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"
+    />
+    <!-- ICONS  -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <!-- TOAST MSG  -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- LIGHT GALLERY - CLICK TO FULLSCREEN IMAGE  -->
+    {% if "/tp/" in request.path or "/edittalentprofile/" in request.path %}
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery-js/1.4.0/css/lightgallery.min.css"
+      integrity="sha512-kwJUhJJaTDzGp6VTPBbMQWBFUof6+pv0SM3s8fo+E6XnPmVmtfwENK0vHYup3tsYnqHgRDoBDTJWoq7rnQw2+g=="
+      crossorigin="anonymous"
+    />
+    {% endif %} 
+    {% if request.path == "/user/editprofile/" or request.path == '/store/manage_store/' %}
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css"
+      integrity="sha512-zxBiDORGDEAYDdKLuYU9X/JaJo/DPzE42UubfBw9yg8Qvb2YRRIQ8v4KsGHOx2H1/+sdSXyXxLXv5r7tHc9ygg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    {% endif %} 
+    
+    <link href="https://releases.transloadit.com/uppy/v2.4.1/uppy.min.css" rel="stylesheet">
+    <!-- SCRIPTS  -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="text/javascript" src="{% static './js/alert.js' %}"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.7.1/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha512-z4OUqw38qNLpn1libAN9BsoDx6nbNFio5lA6CuTp9NlK83b89hgyCVq+N5FdBJptINztxn1Z3SaKSKUS5UP60Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+
+  <body class="noselect">
+    {% if request.path != "/accounts/login/" and request.path != '/survey/'  and request.path != '/user/onboarding/' and request.path != "/accounts/signup/" and "/user/deleteaccount/" not in request.path %} 
+    {% include 'includes/header.html' %} 
+    {% endif %}
+
+    <div class="root-div h-100 d-flex flex-column">
+      {% block content %} 
+      
+      {% endblock %}
+
+      <div class="mt-auto">
+        {% if request.path != "/accounts/login/" and request.path != '/survey/' and request.path != '/user/onboarding/' and request.path != "/accounts/signup/" and "/user/deleteaccount/" not in request.path %} 
+        {% include 'includes/footer.html' %} 
+        {% endif %}
+      </div>
+    </div>
+    <script type="text/javascript">
+      var user = "{{request.user}}";
+      function getToken(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+      const csrftoken = getToken("csrftoken");
+        
+      function getCookie(name) {
+        var cookieArr = document.cookie.split(";");
+        
+        for (var i = 0; i < cookieArr.length; i++) {
+          var cookiePair = cookieArr[i].split("=");
+          
+          if (name == cookiePair[0].trim()) {
+            return decodeURIComponent(cookiePair[1]);
+          }
+        }
+        return null;
+      }
+      
+      var cart = JSON.parse(getCookie("cart"));
+      if (cart == undefined) {
+        cart = {};
+        console.log("Cookie was created.");
+        document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
+      }
+      console.log("Cart:", cart);
+    </script>
+    <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/store.js' %}"></script>
+  </body>
+</html>
+{% endblock %}

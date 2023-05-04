@@ -1,0 +1,344 @@
+{% extends 'index.html' %} 
+{% load static %}
+{% block content %}
+    <div class="center-inner-div">
+        <div class="m-3">
+            <div class="text-center mb-3" style="border-radius: 10px;">
+                <div class="font-weight-bold h6" style="margin-bottom: -10px;">Survey @</div>
+                <div class="nav-app-title d-block" style="font-size: 2em;">Duniya Dekhegi</div>
+                <hr class="hr-simple my-1" />
+            </div>
+            <div class="form-group">
+                <label for="name">Your fullname*</label>
+                <input name="name" type="text" class="form-control" id="name" />
+            </div>
+            <div class="form-group">
+                <label for="email">Your email*</label>
+                <input name="email" type="email" class="form-control" id="email" />
+            </div>
+            <div class="form-group">
+                <label for="phonenumber">Your phonenumber</label>
+                <input name="phonenumber" type="text" class="form-control" id="phonenumber" />
+            </div>
+            <div class="mb-1">Gender*</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="male" value="male">
+                <label class="form-check-label" for="male">
+                    Male
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                <label class="form-check-label" for="female">
+                    Female
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" id="other" value="other">
+                <label class="form-check-label" for="other">
+                    Other
+                </label>
+            </div>
+            <div class="form-group mt-3">
+                <label for="description">Describe about you*</label>
+                <textarea class="form-control" id="description" ></textarea>
+            </div>
+            <div class="form-group mt-3">
+                <label for="primary-skill">Your primary skill*</label>
+                <div class="box-selectpicker">
+                    <select
+                      class="selectpicker form-control mt-2"
+                      style="font-size: 0.9em;"
+                      id="primary-skill"
+                      name="primary-skill"
+                      onchange="handleCategoryChange(event)"
+                    >
+                      <option>Singer</option>
+                      <option>Dancer</option>
+                      <option>Actor</option>
+                      <option>Voice Artist</option>
+                      <option>Comedian</option>
+                      <option>Writer</option>
+                      <option>Model</option>
+                      <option>Other</option>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    <input
+                        type="text"
+                        id="primary-skill-other"
+                        class="form-control my-2 d-none"
+                        name="primary-skill-other"
+                        placeholder="Type here"
+                    /> 
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="secondary-skill">Your secondary skills</label>
+                <input name="secondary-skill" type="text" class="form-control fs-85" id="secondary-skill" placeholder="Singing, dancing etc..."/>
+            </div>
+            <div class="mb-1">Are you looking to get engaged Full-Time/Part-Time ?*</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="engagement" id="fulltime" value="fulltime">
+                <label class="form-check-label" for="fulltime">
+                    Full-time
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="engagement" id="parttime" value="parttime">
+                <label class="form-check-label" for="parttime">
+                    Part-time
+                </label>
+            </div>          
+            <div class="mt-3 mb-1">Are you professionally trained on your primary/secondary skills?*</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="is-trained" id="trained" value=1>
+                <label class="form-check-label" for="trained">
+                    Yes
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="is-trained" id="not-trained" value=0>
+                <label class="form-check-label" for="not-trained">
+                    No
+                </label>
+            </div>
+            <div class="mt-3 mb-2">Availability*</div>
+            <div class="box-selectpicker">
+                <select id="availability" class="selectpicker form-control" multiple data-selected-text-format="count > 2">
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                    <option>Saturday</option>
+                    <option>Sunday</option>
+                </select>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-8 col-sm-6 col-12">
+                    <label for="address">Address*</label>
+                    <input name="address" type="text" class="form-control" id="address" />
+                </div>
+                <div class="col-md-4 col-sm-6 col-12">
+                    <label for="pincode">Pincode*</label>
+                    <input name="pincode"  pattern="[0-9]{5}" type="text" class="form-control" id="pincode" />
+                </div>
+            </div>
+            <div class="row mt-3">     
+                <div class="col">
+                    <label for="state">State*</label>
+                    <div class="box-selectpicker">
+                        <select
+                          class="selectpicker"
+                          title="State"
+                          id="state"
+                          name="state"
+                          data-live-search="true"
+                        >
+                          <option value="" class="clear-choice">Clear choice</option>   
+                          {% for states in statecitydata %}
+                            <option>{{ states }}</option>
+                          {% endfor %}      
+                        </select>
+                    </div>
+                </div> 
+                <div class="col">
+                    <label for="city">City*</label>
+                    <div class="box-selectpicker">
+                        <select
+                          class="selectpicker"
+                          title="City"
+                          id="city"
+                          name="city"
+                          data-live-search="true"
+                        > 
+                          {% for city in cities %}
+                          <option>{{ city }}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 mb-1">Are you willing to travel to perform your skills?*</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="will-travel" id="yes-travel" value=1>
+                <label class="form-check-label" for="yes-travel">
+                    Yes
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="will-travel" id="no-travel" value=0>
+                <label class="form-check-label" for="no-travel">
+                    No
+                </label>
+            </div>
+            <div class="mt-3 mb-2">At what rate do you want to provide your service?*</div>
+            <div class="row">
+                <div id="price-col" class="col">
+                    <div class="d-flex align-items-center">
+                        <span class="h5 mr-2 mb-0">₹</span>
+                        <input name="price" type="text" class="form-control" id="price" />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="box-selectpicker">
+                        <select
+                          class="selectpicker form-control"
+                          style="font-size: 0.9em;"
+                          id="price-rate"
+                          name="price-rate"
+                          onchange="onPriceRateChange(event)"
+                        >
+                          <option>Per day</option>
+                          <option>Per hour</option>
+                          <option>Per item</option>
+                          <option>Price per each product</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3 mb-1">Do you provide training?*</div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="provide-training" id="yes-provide-training" value=1>
+                <label class="form-check-label" for="yes-provide-training">
+                    Yes
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="provide-training" id="not-provide-training" value=0>
+                <label class="form-check-label" for="not-provide-training">
+                    No
+                </label>
+            </div>
+            <div class="mt-3 mb-2">Your public profile links</div>
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-instagram mr-2" style="font-size: 1.4em;"></i>
+                        <input type="text" class="form-control" id="instagram" placeholder="https://">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-facebook mr-2 pr-1" style="font-size: 1.3em;"></i>
+                        <input type="text" class="form-control" id="facebook" placeholder="https://">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-youtube mr-2" style="font-size: 1.4em;"></i>
+                        <input type="text" class="form-control" id="youtube" placeholder="https://">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-twitter mr-2" style="font-size: 1.4em;"></i>
+                        <input type="text" class="form-control" id="twitter" placeholder="https://">
+                    </div>
+                </div>
+            </div>
+            <div id="error" class="d-none alert alert-danger fade show" role="alert"></div>
+            <div class="my-3 float-right">
+                <button class="btn btn-primary fs-95" onclick="submitData()">Submit</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const handleCategoryChange = (e) => {
+            if(e.target.value === "Other"){
+                $("#primary-skill-other").removeClass("d-none");
+            }else{
+                $("#primary-skill-other").addClass("d-none");
+            }
+        }
+
+        const onPriceRateChange = (e) => {
+            if(e.target.value === "Price per each product"){
+                $("#price-col").addClass("d-none")
+            }else{
+                if($("#price-col").hasClass("d-none")){
+                    $("#price-col").removeClass("d-none")
+                }
+            }
+        }
+
+        const submitData = () => {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'survey' %}",
+                data: {
+                    name: $("#name").val(),
+                    email: $("#email").val(),
+                    phone_number: $("#phonenumber").val(),
+                    gender: $("input:radio[name='gender']").val(),
+                    description: $("#description").val(),
+                    primary_skill: $("#primary-skill").val(),
+                    primary_skill_other: $("#primary-skill-other").val(),
+                    secondary_skills: $("#secondary-skill").val(),
+                    engagement: $("input:radio[name='engagement']").val(),
+                    is_trained: $("input:radio[name='is-trained']").val(),
+                    availability: $("#availability").val(),
+                    address: $("#address").val(),
+                    pincode: $("#pincode").val(),
+                    city: $("#city").val(),
+                    state: $("#state").val(),
+                    will_travel: $("input:radio[name='will-travel']").val(),
+                    price: $("#price").val(),
+                    price_rate: $("#price-rate").val(),
+                    provide_training: $("input:radio[name='provide-training']").val(),
+                    instagram_url: $("#instagram").val(),
+                    facebook_url: $("#facebook").val(),
+                    youtube_url: $("#youtube").val(),
+                    twitter_url: $("#twitter").val(),
+                    csrfmiddlewaretoken : '{{csrf_token}}'
+                },
+                success: (response) => {
+                    const error = document.querySelector('#error');
+                    if(response["success"]){
+                        error.classList.add("d-none");
+                        Toastify({
+                            text: "Thank you for filling out this form...",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top", 
+                            position: "center",
+                            backgroundColor: "#5abab7",
+                            style: {
+                                borderRadius: "20px"
+                            },
+                            stopOnFocus: true,
+                            callback: () => {
+                                location.href = "{% url 'home' %}"
+                            }
+                        }).showToast();
+                    }
+                    if(response["error"]){
+                        error.classList.remove("d-none");
+                        error.innerHTML = response["msg"];
+                    }
+                }
+            })
+        }
+    
+        window.onload = () => {
+            const stateCityData = {{ statecitydata|safe }};
+            const stateSel = document.querySelector("#state");	
+            const citySel = document.querySelector("#city");
+
+            stateSel.onchange = function() {
+                citySel.length = 0;
+                if (this.selectedIndex < 1)
+                    return; 
+                const n = stateCityData[this.value] && stateCityData[this.value].length;
+                for (let i=0;i<n;i++ ) {
+                    let city = stateCityData[this.value][i];
+                    citySel.options[citySel.options.length] = new Option(city, city);
+                }
+                $('#city').selectpicker('refresh');
+            }
+        }
+    </script>
+{% endblock %}

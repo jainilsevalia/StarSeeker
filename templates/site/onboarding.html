@@ -1,0 +1,41 @@
+{% extends 'index.html' %} 
+{% load static %}
+{% block content %}
+    <div class="h-100">
+        <div class="video-overlay h-100 w-100"></div>
+        <video class="onboarding-video" autoplay width="100%" height="100%">
+            <source src="{% static './video/onboarding.mp4' %}" type="video/mp4">
+        </video>
+        <div class="text-on-video text-center text-white">
+            <h1 class="font-weight-bold text-uppercase hero-title">Show your talent to the world!</h1>
+            <h5 class="hero-subtitle">Register me as...</h5>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="usertype" id="talentuser" value="talentuser">
+                <label class="form-check-label" for="talentuser">talentuser</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="usertype" id="seller" value="seller">
+                <label class="form-check-label" for="seller">seller</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="usertype" id="normaluser" value="normaluser" checked>
+                <label class="form-check-label" for="normaluser">normaluser</label>
+              </div>
+            <div class="alert mt-2">
+                <button type="button" class="btn btn-primary fs-95" onclick="navigate()">Next</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const navigate = () => {
+            const usertype = $("input[type='radio'][name=usertype]:checked").val();
+            if(usertype === 'talentuser'){
+                location.href = '/user/edittalentprofile/';
+            }else if(usertype === 'seller'){
+                location.href = '/store/manage_store/';
+            }else{
+                location.href = '/'
+            }
+        }
+    </script>
+{% endblock %}

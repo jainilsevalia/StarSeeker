@@ -1,0 +1,61 @@
+<div class="row">
+    
+    {% if not user.othercountry %}    
+    <div class="col box-selectpicker">
+        <label class="fs-95 font-weight-bold mb-2" for="user-state">State</label>
+        <select class="selectpicker form-control" title="State" id="user-state" name="state" data-live-search="true">
+            <option value="" class="clear-choice">Clear choice</option>
+            {% for states in statecitydata %}
+            <option>{{ states }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col box-selectpicker">
+        <label class="fs-95 font-weight-bold mb-2" for="user-city">City</label>
+        <select class="selectpicker form-control" title="City" id="user-city" name="city" data-live-search="true">
+            {% for city in cities %}
+            <option>{{ city }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% else %}
+    <div class="col">
+        <label class="fs-95 font-weight-bold mb-2" for="user-state">State</label>
+        <input id="user-state" type="text" class="form-control" name="state" value="{{ user.othercountry.state }}"/>
+    </div>
+    <div class="col">
+        <label class="fs-95 font-weight-bold mb-2" for="user-city">City</label>
+        <input id="user-city" type="text" class="form-control" name="city" value="{{ user.othercountry.city }}"/>
+    </div>
+    {% endif %}
+        
+    <div class="col">
+        <label class="fs-95 font-weight-bold mb-2" for="user-pincode">Pincode</label>
+        <input id="user-pincode" type="text" class="form-control" pattern="[0-9]{5}" />
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <label class="fs-95 font-weight-bold mb-2" for="user-address">Address</label>
+        <input id="user-address" type="text" class="form-control" />
+    </div>
+</div>
+<script>
+    window.onload = () => {
+    const stateCityData = {{ statecitydata|safe }};
+    const stateSel = document.querySelector("#user-state");	
+    const citySel = document.querySelector("#user-city");
+
+    stateSel.onchange = function() {
+        citySel.length = 0;
+        if (this.selectedIndex < 1)
+            return; 
+        const n = stateCityData[this.value] && stateCityData[this.value].length;
+        for (let i=0;i<n;i++ ) {
+            let city = stateCityData[this.value][i];
+            citySel.options[citySel.options.length] = new Option(city, city);
+        }
+        $('#user-city').selectpicker('refresh');
+    }
+  }
+</script>

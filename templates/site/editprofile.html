@@ -1,0 +1,316 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+
+<!-- MAIN  -->
+<div class="container px-5 px-md-0 mt-5">
+  <div>
+    <h3><b>{{user.name}}'s Profile</b></h3>
+    <span>Set up or edit your profile on Duniya Dekhegi</span>
+  </div>
+  <div class="row mt-5">
+    <div class="col-md-3 mb-5 fs-9">
+      <div class="list-group list-group-flush" role="tablist">
+        <a
+          class="custom-list-item mb-2 active"
+          id="list-editprofile-list"
+          data-toggle="list"
+          href="#list-editprofile"
+          role="tab"
+          aria-controls="editbasicprofile"
+          >Edit basic profile</a
+        >
+        <a
+          class="custom-list-item mb-2"
+          href="{% url 'edittalentprofile'  %}"
+          role="tab"
+          aria-controls="edittalentprofile"
+          target="_blank"
+          >
+          {% if user.talentuser %} 
+            Edit talent profile✨ 
+          {% else %} 
+            Register as talent✨ 
+          {% endif %}</a
+        >
+        <a
+          class="custom-list-item mb-2"
+          href="{% url 'manage_store' %}"
+          role="tab"
+          aria-controls="managestore"
+          target="_blank"
+          >
+          {% if user.seller %}
+          Manage your store
+          {% else %}  
+          Create your store🛍️
+          {% endif %}
+          </a
+        >
+        <a
+          class="custom-list-item mb-2"
+          id="list-address-list"
+          data-toggle="list"
+          href="#list-address"
+          role="tab"
+          aria-controls="address"
+          >Add/Edit address</a
+        >
+        <a
+          class="custom-list-item mb-2"
+          id="list-password-list"
+          data-toggle="list"
+          href="#list-password"
+          role="tab"
+          aria-controls="password"
+          >Password</a
+        >
+        <a
+          class="custom-list-item mb-2"
+          id="list-account-list"
+          data-toggle="list"
+          href="#list-account"
+          role="tab"
+          aria-controls="account"
+          >Account settings</a
+        >
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="tab-content" id="nav-tabContent">
+        <div
+          class="tab-pane fade show active"
+          id="list-editprofile"
+          role="tabpanel"
+          aria-labelledby="list-editprofile-list"
+        >
+          {% include 'includes/editprofile/edit-basic-profile.html' %}
+        </div>
+        <div class="tab-pane fade" id="list-address" role="tabpanel" aria-labelledby="list-address-list">
+          <div id="user-addresses" class="d-flex flex-column mb-3">
+            <strong class="mb-3">Your
+              {% if addresses|length > 1 %}
+              addresses
+              {% else %}
+              address
+              {% endif %}
+            </strong>   
+            <div class="d-flex flex-wrap">
+              {% for address in addresses %}
+              <div id="address-{{ forloop.counter }}" class="address-card p-3 fs-9 d-flex flex-column mb-3 mr-3" onclick="setDefaultAddress('{{address.id}}')">
+                {% if not address.is_default %}
+                <div>
+                  <i class="bi bi-x-circle-fill float-right"
+                    onclick="removeAddress(event,'{{address.id}}')"></i>
+                </div>
+                {% endif %}
+                {{ address.address }}, {{ address.city }}, {{ address.state }}, {{ address.pincode }}
+                <div class="mt-2">
+                  {% if address.is_default %}
+                  <h6 class="mb-0"><span class="badge badge-info">Default</span></h6>
+                  {% endif %}              
+                  <i class="bi bi-pencil-square float-right" style="font-size: 1.2em;"
+                    onclick="fillAddress(event, '{{ address.id }}','{{address.state}}', '{{address.city}}', '{{address.pincode}}', '{{address.address}}')"></i>                
+                </div>
+              </div>
+              {% empty %}
+              {% for address in otherCountry %}
+              <div id="address-{{ forloop.counter }}" class="address-card p-3 fs-9 d-flex flex-column mb-3 mr-3" onclick="setDefaultAddress('{{address.id}}', 1)">
+                {% if not address.is_default %}
+                <div>
+                  <i class="bi bi-x-circle-fill float-right"
+                    onclick="removeAddress(event,'{{address.id}}', 1)"></i>
+                </div>
+                {% endif %}
+                {{ address.address }}, {{ address.city }}, {{ address.state }}, {{ address.pincode }}
+                <div class="mt-2">
+                  {% if address.is_default %}
+                  <h6 class="mb-0"><span class="badge badge-info">Default</span></h6>
+                  {% endif %}              
+                  <i class="bi bi-pencil-square float-right" style="font-size: 1.2em;"
+                    onclick="fillAddress(event, '{{ address.id }}','{{address.state}}', '{{address.city}}', '{{address.pincode}}', '{{address.address}}')"></i>                
+                </div>
+              </div>
+              {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+          
+          <hr/>
+          <div class="row">
+            <div class="col">
+              {% include 'includes/address.html' %}
+              <button id="add-address-btn" class="btn btn-primary fs-9 mt-3" onclick="addAddress()">
+                Add address
+              </button>
+              <!-- <button class="btn btn-primary fs-9 mt-3" onclick="editAddress()">
+                Edit address
+              </button> -->
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="list-account"
+          role="tabpanel"
+          aria-labelledby="list-account-list"
+        >
+          {% include 'includes/editprofile/change-email.html' %}
+        </div>
+        <div
+          class="tab-pane fade"
+          id="list-password"
+          role="tabpanel"
+          aria-labelledby="list-password-list"
+        >
+          <form class="fs-9">
+            <div class="form-group w-75">
+              <label for="oldpassword">Old password </label>
+              <input type="password" class="form-control" id="oldpassword" />
+            </div>
+            <div class="form-group w-75">
+              <label for="newpassword">New password</label>
+              <input type="password" class="form-control" id="newpassword" />
+            </div>
+            <div
+              id="password-update-alert"
+              class="d-none alert alert-success fade show w-75"
+              role="alert"
+            >
+              Your password has been updated
+            </div>
+            <div
+              id="password-error-alert"
+              class="d-none alert alert-danger fade show w-75"
+              role="alert"
+            ></div>
+            <button
+              type="button"
+              class="btn btn-primary fs-1"
+              onclick="setNewPassword()"
+            >
+              Change
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript"> 
+  const setNewPassword = () => {
+    const successAlert = document.querySelector("#password-update-alert");
+    const errorAlert = document.querySelector("#password-error-alert");
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        oldpassword: $("#oldpassword").val(),
+        newpassword: $("#newpassword").val(),
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+      },
+      success: (response) => {
+        if (response["success"]) {
+          successAlert.classList.remove("d-none");
+          errorAlert.classList.add("d-none");
+        } else {
+          errorAlert.classList.remove("d-none");
+          errorAlert.innerHTML = response["error"];
+          successAlert.classList.add("d-none");
+        }
+      },
+    });
+  };
+
+  const deleteAccount = () => {
+    $.ajax({
+      type: "GET",
+      url: "{% url 'editprofile' %}",
+      data: {
+        delete_account: true,
+      },
+      success: (response) => {
+        if (response["success"]) {
+          const alert = document.querySelector("#delete-account-alert");
+          alert.classList.remove("d-none");
+        }
+      },
+    });
+  };
+
+  let editId = '';
+  const addAddress = () => {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        state: $("#user-state").val(),
+        city: $("#user-city").val(),
+        pincode: $("#user-pincode").val(),
+        address: $("#user-address").val(),
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        edit_id: editId,
+      },
+      success: (response) => {
+        $("#user-addresses").load(location.href + " #user-addresses>*")
+        $("#add-address-btn").text("Add Address");
+        if($("#user-state").prop("type") === 'text'){
+          $("#user-state").val('');
+          $("#user-city").val('');
+        }else{
+          $("#user-state").selectpicker('val','');
+          $("#user-city").selectpicker('val','');
+        }
+        $("#user-pincode").val('');
+        $("#user-address").val('');
+        edit_id = ''
+      }
+    })
+  }
+
+  const setDefaultAddress = (id, is_other_country) => {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        "address_to_set_default": id,
+        "is_other_country": is_other_country,
+        "csrfmiddlewaretoken": "{{ csrf_token }}"
+      },
+      success: (response) => {
+        $("#user-addresses").load(location.href + " #user-addresses>*");
+      }
+    })
+  }
+
+  const removeAddress = (e, id,is_other_country) => {
+    e.stopPropagation();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        "address_to_remove": id,
+        "is_other_country": is_other_country,
+        "csrfmiddlewaretoken": "{{ csrf_token }}"
+      },
+      success: (response) => {
+        $("#user-addresses").load(location.href + " #user-addresses>*");
+      }
+    })
+  }
+
+  const fillAddress = (e,id, state, city, pincode, address) => {
+    e.stopPropagation();
+    editId = id;
+    $("#add-address-btn").text("Save Address");
+    if($("#user-state").prop("type") === 'text'){
+      $("#user-state").val(state);
+      $("#user-city").val(city);
+    }else{
+      $("#user-state").selectpicker('val', state);
+      $("#user-city").selectpicker('val', city);
+    }
+    $("#user-pincode").val(pincode);
+    $("#user-address").val(address);
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+    {% extends 'index.html' %} {% load static %} {% block content %}
+    <div class="container-fluid">
+    <div id="profile-info-container">
+        <div
+        id="profile-info"
+        class="d-flex flex-column flex-md-row align-items-center"
+        >
+        <img
+            src="
+            {% if user.profile_picture %}
+            {{ user.profile_picture.url }}
+            {% else %}
+            {% static './img/avatar.png' %}            
+            {% endif %}
+            "
+            class="rounded-circle mr-3 mb-2"
+            width="170px"
+            height="170px"
+        />
+        <span class="fs-9">
+            <h2 class="font-weight-bold"><b>{{ user.name }}</b></h2>
+            <div class="d-flex">
+            <i class="bi bi-envelope h5 mr-2"></i>
+            <span>{{ user.email }}</span>
+            </div>
+            
+            {% if user.phone_number %}
+            <div class="d-flex">
+                <i class="bi bi-telephone h5 mr-2"></i> <span>{{ user.phone_number }}</span>
+            </div>
+            {% endif %}
+            <a class="btn btn-primary fs-9" href="{% url 'editprofile' %}">Edit Profile</a>
+        </span>
+        </div>
+    </div>
+
+    <ul class="nav nav-pill custom-pill mt-4" role="tablist">
+        <li class="nav-item" role="presentation">
+        <a
+            class="nav-link active"
+            id="wishlist-tab"
+            data-toggle="tab"
+            href="#wishlist"
+            role="tab"
+            aria-controls="wishlist"
+            aria-selected="true"
+            >Wishlist</a
+        >
+        </li>
+        <li class="nav-item" role="presentation">
+        <a
+            class="nav-link"
+            id="collaboration-tab"
+            data-toggle="tab"
+            href="#collaboration"
+            role="tab"
+            aria-controls="collaboration"
+            aria-selected="false"
+            >Collaborated With</a
+        >
+        </li>
+        <li class="nav-item" role="presentation">
+        <a
+            class="nav-link"
+            id="booking-tab"
+            data-toggle="tab"
+            href="#booking"
+            role="tab"
+            aria-controls="booking"
+            aria-selected="false"
+            >Booking Info</a
+        >
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div
+        class="tab-pane active"
+        id="wishlist"
+        role="tabpanel"
+        aria-labelledby="wishlist-tab"
+        >
+        <br />
+        <br />
+        </div>
+        <div
+        class="tab-pane"
+        id="collaboration"
+        role="tabpanel"
+        aria-labelledby="collaboration-tab"
+        >
+        <br />
+        <br />
+        </div>
+        <div
+        class="tab-pane"
+        id="booking"
+        role="tabpanel"
+        aria-labelledby="booking-tab"
+        >
+        <br />
+        <br />
+        </div>
+    </div>
+    </div>
+    {% endblock %}

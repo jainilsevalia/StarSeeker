@@ -1,0 +1,35 @@
+{% load static %}
+{% load filters %}
+<div class="product-cards" id="products-list">
+    {% for product in products %}
+    <div class="product-card box-shadow-outset br-20 p-3">
+        {% if product.isVideoThumbnail %}
+        <video src="{{ product.thumbnail.url }}" class="object-fit-cover br-20 aspect-ratio-1 w-100" autoplay
+            loop></video>
+        {% else %}
+        <img class="object-fit-cover br-20 aspect-ratio-1" src="{{ product.thumbnail.url }}" width="100%" />
+        {% endif %}
+
+        <div class="px-2 mt-2">
+            <div class="fs-9"><strong style="color: grey;text-transform: uppercase;">{{ product.category }}</strong>
+            </div>
+            <div>
+                <strong>{{ product.name }}</strong>
+                <strong class="float-right">⭐ {{ product.rating }}</strong>
+            </div>
+            <div class="mt-3 d-flex justify-content-between">
+                <h5 class="pt-2"><strong>₹ {{ product.price }}</strong></h5>
+                <div class="d-flex" style="gap: 10px;">
+                    <div class="circle-icon bg-darkbluegray bg-hover-blue update-cart" data-product={{product.id}} data-action="add"
+                        style="font-size: 1.4em;width: 40px;height: 40px"><i class="bi bi-cart-plus"></i>
+                    </div>
+                    <div x-data="{id: {{ product.id }} }" @click="handleWishlist(id)"
+                        class="circle-icon {% if product.id in wishlistItems %}bg-red text-white{% else %}bg-darkbluegray bg-hover-red{% endif %}"
+                        style="font-size: 1.3em;width: 40px;height: 40px"><i class="bi bi-heart mt-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

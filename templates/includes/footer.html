@@ -1,0 +1,105 @@
+{% load static %}
+<div class="footer p-5 d-md-flex mt-3">
+    <div class="mr-5">
+      <img src="{% static 'img/logo.png' %}" width="40px" height="40px" alt="app-logo" />
+      <div class="my-3 fs-9" style="font-weight: 600">
+        <b>DuniyaDekhegi</b><br />
+        where we recognize<br />
+        people's talent and <br />
+        spread it to the world!
+      </div>
+      <span class="d-flex h5 align-items-center">
+        <a target="_blank" href="https://www.instagram.com/duniya.dekhegi.india/" style="color: inherit;">
+          <i class="bi bi-instagram mr-3"></i>
+        </a>
+        <a target="_blank" href="https://twitter.com/DuniyaDekhegi" style="color: inherit;">
+          <i class="bi bi-twitter mr-3"></i>
+        </a>
+        <a target="_blank" href="https://www.facebook.com/duniya.dekhegi.india/" style="color: inherit;">
+          <i class="bi bi-facebook mr-3"></i>
+        </a>
+        <a target="_blank" href="https://www.youtube.com/channel/UC1OLKfMcskMwJUVyU3I-Ysg" style="color: inherit;padding-top: 2px;">
+          <i class="bi bi-youtube mr-3" style="font-size:1.1em"></i>
+        </a>
+      </span>
+    </div>
+    <div class="row ml-md-5" style="margin-top: 25px">
+      <div class="col mr-3">
+        <h6 style="font-weight: bold">For users</h6>
+        <ul class="footer-list">
+          <li>
+            <a class="link" href="{% url 'account_signup' %}">
+              Register as talent
+            </a>
+          </li>
+          <li>
+            <!-- <a class="link" href="{% url 'blogs' %}"> -->
+              Read blogs
+            <!-- </a> -->
+          </li>
+          <li>
+            <a class="link" href="{% url 'survey' %}">
+              Survey
+            </a>
+          </li>
+          <li>
+            <a class="link" href="mailto:duniya.dekhegi.india@gmail.com?subject=Report%20a%20Bug" target="_blank">
+              Report a bug
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col mr-3">
+        <h6 style="font-weight: bold">Company</h6>
+        <ul class="footer-list">
+          <li>
+            <a class="link" href="{% url 'about' %}">
+              About us
+            </a>
+          </li>
+          <li>
+            <a class="link" href="{% url 'contactus' %}">
+              Contact us
+            </a>
+          </li>
+          <li>
+            <!-- <a class="link" href="{% url 'termsofservice' %}"> -->
+              Terms of service
+            <!-- </a> -->
+          </li>
+          <li>
+            <!-- <a class="link" href="{% url 'privacypolicy' %}"> -->
+              Privacy policy
+            <!-- </a> -->
+          </li>
+        </ul>
+      </div>
+      <div class="col mr-3">
+        <h6 style="font-weight: bold">Other services</h6>
+        <ul class="footer-list">
+          <!-- <li>
+            <a class="link" href="{% url 'bookvenue' %}">
+              Book a venue
+            </a>
+          </li> -->
+          <li>
+            <!-- <a class="link" href="{% url 'advertisement' %}"> -->
+              Advertisement
+            <!-- </a> -->
+          </li>
+          <li>
+            <!-- <a class="link" href="{% url 'brandcollaboration' %}"> -->
+              Brand collaboration
+            <!-- </a> -->
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- <div
+    class="footer text-center"
+    style="font-size: 0.9em; font-weight: 600; padding-bottom: 5px"
+  >
+    © 2020 AiVedam technologies | All Rights Reserved
+  </div> -->

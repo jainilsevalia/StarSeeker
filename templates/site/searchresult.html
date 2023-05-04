@@ -1,0 +1,326 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+  <div class="search-background"></div>
+  <form method="POST" action="{% url 'search' %}">
+    {% csrf_token %}
+    <div class="d-flex flex-column align-items-center justify-content-center">
+      <div class="bigsearch-wrap">
+        <input name="keyword" type="text" id="bigsearch"  {% if keyword %}
+        value = {{keyword}}
+        {% endif %}/>
+      </div>
+      <span class="mt-3 text-muted h6">Search the talent around the world !</span>
+    </div>
+  </form>
+  <div class="container">
+    <!-- MOBILE TABLET  -->
+    <div id="mobile-sort-filter">
+      <div class="row d-flex mt-3">
+        &ensp;
+        <button
+          class="btn dropdown-toggle"
+          type="button"
+          id="sorting"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Sort by
+        </button>
+        <button class="btn ml-auto" onclick="toggleFilters()">Filters</button>
+        &ensp;
+      </div>
+      <hr />
+    </div>
+    <!-- DESKTOP -->
+    <div class="row mt-3">
+      <div class="col sort-filter">
+        <div class="dropdown">
+          <button
+            class="btn dropdown-toggle"
+            type="button"
+            id="sorting"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Sort by
+          </button>
+          <div class="dropdown-menu" aria-labelledby="sorting">
+            {% if request.user.is_authenticated %}<a class="dropdown-item" href="#">Wishlist</a>{% endif %}
+            <a class="dropdown-item" href="#">Newest</a>
+            <!-- <a class="dropdown-item" href="#">Trending</a> -->
+          </div>
+        </div>
+      </div>
+      <div class="col d-flex justify-content-center">
+        <ul class="nav nav-pills custom-pill" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a
+              class="nav-link active"
+              href="#all"
+              data-toggle="tab"
+              role="tab"
+              id="all-tab"
+              aria-controls="all"
+              aria-selected="true"
+              onclick="submit_formdata()"
+              >All</a
+            >
+          </li>
+          {% for tc in talent_categories %}
+          <li class="nav-item" role="presentation">
+            <a
+              class="nav-link"
+              href="#{{tc|cut:'-'}}"
+              data-toggle="tab"
+              role="tab"
+              id="{{tc}}-tab"
+              onclick="submit_formdata()"
+              aria-controls="{{tc}}"
+              aria-selected="false"
+              >{{tc|cut:'-'}}</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col sort-filter">
+        <button class="btn float-right" onclick="toggleFilters()">
+          Filters
+        </button>
+      </div>
+    </div>
+    <div id="filters" class="mt-3">
+      <form>
+        {% csrf_token %}
+        <div class="form-row align-items-center">
+          <div class="col">
+            <label class="ml-2 mb-2 font-weight-bold" for="states">States</label>
+            <select
+              class="selectpicker form-control mb-2"
+              id="state_search"
+              title="Nothing selected"
+              data-live-search="true"
+            >
+            <option value="" class="clear-choice">Clear choice</option>   
+            {% for states in statecitydata %}
+              <option>{{ states }}</option>
+            {% endfor %}      
+            </select>
+          </div>
+          <div class="col">
+            <label class="ml-2 mb-2 font-weight-bold" for="cities">Cities</label>
+            <select
+              class="selectpicker form-control mb-2"
+              id="city_search"
+              data-live-search="true"
+              data-selected-text-format="count > 3"
+              onchange="submit_formdata()"
+              multiple
+            >
+              {% for city in cities %}
+              <option>{{ city }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col">
+            <label class="ml-2 mb-2 font-weight-bold" for="rating">Rating</label>
+            <select
+              class="selectpicker form-control mb-2"
+              id="rating_search"
+              title="Nothing selected"
+              onchange="submit_formdata()"
+            >
+              <option value="" class="clear-choice">Clear choice</option>
+              <option value="5">★ 5</option>
+              <option value="4">★ 4 & above</option>
+              <option value="3">★ 3 & above</option>
+              <option value="2">★ 2 & above</option>
+              <option value="1">★ 1 & above</option>
+            </select>
+          </div>
+          <div class="col">
+            <label class="ml-2 mb-2 font-weight-bold" for="price">Price</label>
+            <select
+              class="selectpicker form-control mb-2"
+              id="price_search"
+              title="Nothing selected"
+              onchange="submit_formdata()"
+            >
+              <option value="" class="clear-choice">Clear choice</option>
+              <option value="1000-3000">1000-3000</option>
+              <option value="3000-5000">3000-5000</option>
+              <option value="5000-7000">5000-7000</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- TAB CONTENT  -->
+    <div class="tab-content mt-4">
+      <div
+        class="tab-pane active"
+        role="tabpanel"
+        id="all"
+        data-category="all"
+        aria-labelledby="all-tab"
+      >
+        <!-- CARD  -->
+        {% include 'includes/searchtalentuser.html' %}
+      </div>
+
+      {% for tc in talent_categories %}
+      <div
+        class="tab-pane"
+        role="tabpanel"
+        id="{{tc|cut:'-'}}"
+        data-category="{{tc}}"
+        aria-labelledby="{{tc}}-tab"
+      >
+        <div class="d-flex justify-content-center">
+          <div class="talent-card-wrapper">
+            {% for tuser in talentusers %} 
+              {% if tc in tuser.category %}
+              {% if tuser.is_kyc_done == True %}
+                <div class="talent-card">
+                  <a href="{% url 'talentprofile' tuser.generaluser.userlink %}">
+                    <div class="talent-thumbnail-container">
+                      <img
+                        src="{% if tuser.thumbnail %}{{ tuser.thumbnail.url }}{% else %}{% static './img/no-thumbnail.jpg' %}{% endif %}"
+                        class="talent-thumbnail"
+                      />
+                    </div>
+                  </a>
+                  <div class="mt-2 mx-1 d-flex align-items-center">
+                    <img
+                      src="
+                        {% if tuser.generaluser.profile_picture %}
+                          {{ tuser.generaluser.profile_picture.url }}
+                        {% else %}
+                          {% static './img/avatar.png' %}
+                        {% endif %}
+                        "
+                      class="rounded-circle talent-img"
+                    />
+                    <div class="d-flex flex-column px-1 talent-info">
+                      <!-- #TODO: Uncomment the below lines to implement fake name functionality. -->
+                      {# if request.user.is_authenticated #}
+                      <span>{{ tuser.generaluser.name }}</span>
+                      {# else #}
+                      <!-- <span>{{ tuser.generaluser.name }}</span> -->
+                      {# endif #}
+                      <span>
+                        {{ tuser.category }}
+                      </span>
+                    </div>
+                    <div class="d-flex flex-column px-1 talent-info ml-auto">
+                      <span><i class="bi bi-geo-alt"></i>
+                        <span> 
+                          {% if not tuser.generaluser.address.city.name or not tuser.generaluser.address.state.name %}
+                          {{ tuser.generaluser.otherCountry.city }}, {{ tuser.generaluser.otherCountry.state }}
+                          {% else %}          
+                          {{  tuser.generaluser.address.city.name }}, {{  tuser.generaluser.address.state.name }}
+                          {% endif %}
+                        </span>
+                      </span>
+                      <span>
+                        {% if tuser.rating_avg != 0 %}
+                        <span style="color: rgb(255, 166, 0)"
+                          ><i class="bi bi-star-fill"></i>              
+                            {{ tuser.rating_avg|floatformat }}
+                        </span>
+                        {% endif %}
+                        <span style="float: right">₹ {{ tuser.price }} </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endif %} 
+              {% endif %} 
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+<!-- SCRIPTS  -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script type="text/javascript">
+
+
+
+const typed = new Typed("#bigsearch", {
+  strings: ["You can search like...","Top Artist in Surat...", "Guitarist for birthday party...", "Trending Actors around Delhi...", "Search"],
+  attr: "placeholder",
+  typeSpeed: 100
+});
+
+toggleFilters = () => {
+        const filters = document.querySelector("#filters");
+        if (window.getComputedStyle(filters).display === "none") {
+          $("#filters").slideDown("fast");
+        } else {
+          $("#filters").slideUp("fast");
+        }
+      };
+
+      let isSortByWishlist = false;
+      const submit_formdata = () => {
+        setTimeout(() => {
+          $.ajax({
+            type: "POST",
+            url: "{% url 'filter' %}",
+            data: {
+              csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+              state_search: $("#state_search").val(),
+              city_search: $("#city_search").val(),
+              rating_search: $("#rating_search").val(),
+              price_search: $("#price_search").val(),
+              category_search: $(".tab-pane.active").attr('id'),
+              wishlist_search: isSortByWishlist,
+              keyword: "{{ keyword }}"
+            },
+            success: (response) => {
+              $(".tab-pane.active").html(response);
+            },
+          });
+        }, 100);
+      };
+
+      const sortBy = (e) => {
+        if(e.target.value === 'Wishlist'){
+          isSortByWishlist = true
+          submit_formdata()
+        }
+        if(e.target.value === 'Default'){
+          isSortByWishlist = false
+          submit_formdata()
+        }
+      }
+
+      window.onload = () => {
+        let stateCityData = {{ statecitydata|safe }}
+        let stateSel = document.querySelector("#state_search");	
+        let citySel = document.querySelector("#city_search");
+
+        stateSel.onchange = function () {
+          submit_formdata()
+          citySel.length = 0;
+          if (this.selectedIndex < 1)
+            return; 
+          let n = stateCityData[this.value] && stateCityData[this.value].length
+          for (let i=0;i<n;i++ ) {
+            let city = stateCityData[this.value][i]
+            citySel.options[citySel.options.length] = new Option(city, city);
+          }
+          $('#city_search').selectpicker('refresh')
+        }
+      }     
+</script>
+{% endblock %}

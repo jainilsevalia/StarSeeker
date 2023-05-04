@@ -1,0 +1,56 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+
+<div>
+  <div
+    class="
+      d-flex
+      flex-column
+      justify-content-center
+      align-items-center
+      bg-gray
+      p-3
+    "
+  >
+    <h3><b>Your cart</b></h3>
+    <span id="cartTaglines" />
+    <ul class="nav nav-pill custom-box-pill mt-2" role="tablist"> 
+        <li class="nav-item" >
+          <a
+              class="nav-link active"
+              id="products-tab"
+              data-toggle="tab"
+              href="#products"
+              role="tab"
+              aria-controls="products"
+              aria-selected="true"
+              >Products <span class="badge badge-primary ml-1">{{ user.store_cart.get_cart_items_count }}</span>
+          </a>
+        </li>
+        <li class="nav-item" >
+          <a
+              class="nav-link"
+              id="talents-tab"
+              data-toggle="tab"
+              href="#talents"
+              role="tab"
+              aria-controls="talents"
+              aria-selected="false"
+              >Talentusers <span class="badge badge-primary ml-1">{{user.user_cart.cart_item_count}}</span>
+          </a>
+        </li>          
+    </ul>
+  </div>
+  <div class="tab-content">
+    <div class="tab-pane active" id="products" role="tabpanel" aria-labelledby="products-tab">
+      {% include 'includes/cart/store-cart.html' %}
+    </div>
+    <div  class="tab-pane"  id="talents"  role="tabpanel" aria-labelledby="talents-tab">
+      {% include 'includes/cart/talent-cart.html' %}
+    </div>
+  </div>
+</div>
+
+<!-- <input id="cart-item-length" type="hidden" value="{{ user.user_cart.cart_total }}"> -->
+
+
+{% endblock %}

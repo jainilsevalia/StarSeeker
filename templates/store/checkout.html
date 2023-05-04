@@ -1,0 +1,170 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block style %}
+<style>
+        .card-input-element {
+            display: none;
+        }
+
+        .card-input {
+            
+            padding: 10px;
+        }
+
+        .card-input:hover {
+            cursor: pointer;
+        }
+
+        .card-input-element:checked + .card-input {
+            border-radius:5px;
+            box-shadow: 0 0 2px 2px #2ecc71;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+</br>
+<div class="container-fluid" style="justify-content:center; padding:0; margin:0;">
+    <div class="row" style="margin-left:4%;margin-right:4%">
+    <div class="col-md-8">
+        <div class="box-element">
+            <a class="btn " href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+            <hr>
+            <p style="text-align:center;"><h4>Order Summary</h4></p>
+            <hr>
+            <div class="row" style="">
+            {% for item in items %}
+                <div class="col-sm-3">
+                    <div><img class="talent-thumbnail" id="product-img" src="{{ item.product.thumbnail.url }}" alt=""
+                        style="width:150px; height:150px;margin-bottom:2%;" >
+                    </div>
+                    <div style="width:150px;"><p>{{ item.product.name }} </p>
+                            <p>₹ {{ item.product.price|floatformat }} x {{ item.quantity }}</p>
+                    </div>
+                </div>    
+            {% endfor %}
+            </div> 
+        </div>
+    </div>
+    <div class="col-md-3" style="margin-right:1%;">
+        <div class="card"  style="padding:2%; border-radius: 25px;">
+            <div class="card-body">
+                <div style="display:grid;grid-template-columns:70% 30%;">
+                    <div><p><b>Total Items</p>
+                        <p>Totla Quantity</p>
+                        <p>Total price</b></p>
+                    </div>
+                    <div>
+                        <p>{{order.get_cart_items_count}}</p>
+                        <p>{{order.get_cart_items_quantity}}</p>
+                        <p>₹ {{order.get_cart_total|floatformat}}</p>
+                    </div>                    
+                </div>
+                <hr>
+                <div style="display:grid;align-item:center;" ><a href="{% url 'handler' %}" class="btn btn-primary" id="pay-btn"> Make Payment </a></div>
+            </div>
+        </div>
+    </div>
+    <br/>
+</div>
+{% endblock %}
+
+{% block script %}
+<!-- Razorpay's Javascript code. -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  var options = {
+     
+    // Enter the Key ID generated from the Dashboard
+    key: "{{ razorpay_merchant_key }}",
+     
+    // Amount is in currency subunits.
+    // Default currency is INR. Hence,
+    // 50000 refers to 50000 paise
+    amount: "{{ razorpay_amount }}",
+    currency: "{{ currency }}",
+     
+    // Your/store name.
+    name: "DD E-store",
+     
+    // Pass the `id` obtained in the response of Step 1
+    order_id: "{{ razorpay_order_id }}",
+    callback_url: "{% url 'payment_handler' %}",
+    
+  };
+   
+  // initialise razorpay with the options.
+  var rzp1 = new Razorpay(options);
+   
+  // add event listener to the payment button.
+  document.getElementById("pay-btn").onclick = function (e) {
+    rzp1.open();
+    e.preventDefault();
+  };
+</script>
+<script type="text/javascript">
+    
+    $(document).on('submit','#address-form', function(e){
+        e.preventDefault()
+        console.log('Form Submitted.')
+        document.getElementById('form-button').classList.add('hidden')
+        document.getElementById('payment-info').classList.remove('hidden')
+
+    })
+
+   
+
+    // function submitFormData(){
+        // var userFormData = {
+        //     'name':null,
+        //     'email':null,
+        //     'total':total
+        // }
+        // var shippingInfo = {
+        //     'address':null,
+        //     'city':null,
+        //     'state':null,
+        //     'pincode':null,
+        //     'country':null
+        // }
+
+        // shippingInfo.address=form.address.value
+        // shippingInfo.city=form.city.value
+        // shippingInfo.state=form.state.value
+        // shippingInfo.pincode=form.pincode.value
+        // shippingInfo.country=form.country.value
+
+        // if(user==='AnonymousUser'){
+        //     userFormData.name=form.name.value
+        //     userFormData.email=form.email.value
+        // } else{
+        //     userFormData.name='{{user.customer.name}}'
+        //     userFormData.email='{{user.email}}'
+        // }
+
+    //     var url = '/process_order/'
+    // fetch(url, {
+    //     method: "POST",
+    //     headers: {
+    //         'Content-Type':'application/json',
+    //         'X-CSRFToken':csrftoken,
+    //     },
+    //     body:JSON.stringify({
+    //         'form':userFormData,
+    //         'shipping':shippingInfo
+    //     })
+    // })
+    // .then((response) => response.json())
+    // .then((data) => {
+    //     console.log('Success:',data)
+    //     cart = {}
+    //     document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/"
+    //     alert('Transaction Completed.')
+    //     window.location.href = "{% url 'store' %}"
+    // })
+
+    //     console.log('UserInfo:',userFormData)
+    //     console.log('ShippingAddress:',shippingInfo)
+    // }
+</script>
+{% endblock %}

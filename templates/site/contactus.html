@@ -1,0 +1,71 @@
+{% extends 'index.html' %} 
+{% load static %} 
+{% block content %}
+<div class="center-inner-div mt-4 mb-5 h-100">
+    <div class="help-form p-4">
+        <div class="d-flex flex-column flex-md-row">
+            <div class="form-title-wrapper d-flex flex-column p-3">
+                <div class="form-title">
+                    <b>CONTACT</b>
+                    <b>US</b>
+                </div>
+                <!-- <div>CONTACT INFO : +62 81 314 928 595</div> -->
+            </div>
+            <div class="form-fields-wrapper">
+                <div class="help-form-fields p-3">
+                    <div class="form-group">
+                        <label for="name">Name*</label>
+                        <input class="form-control" id="name" value="{{ user.name }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Email*</label>
+                        <input class="form-control" id="email" value="{{ user.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Contact</label>
+                        <input class="form-control" id="contact" value="{{ user.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Message*</label>
+                        <textarea class="form-control" id="message"></textarea>
+                    </div>
+                    <div
+                        id="alert"
+                        class="d-none alert alert-danger fade show"
+                        role="alert"
+                    ></div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary fs-9 mx-1" onclick="submitContactUs()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const submitContactUs = () => {
+        $("#alert").addClass("d-none")
+        $.ajax({
+            type: "POST",
+            url: "{% url 'contactus' %}",
+            data: {
+                name: $("#name").val(),
+                email: $("#email").val(),
+                contact: $("#contact").val(),
+                message: $("#message").val(), 
+                csrfmiddlewaretoken : '{{csrf_token}}'
+            },
+            success: (response) => {
+                if(response["success"]){
+                    $("#alert").removeClass("d-none alert-danger").addClass("alert-success");
+                    $("#alert").text(response["success-msg"]);
+                }
+                if(response["error"]){
+                    $("#alert").removeClass("d-none")
+                    $("#alert").text(response["error-msg"]);
+                }
+            }
+        })
+    }
+</script>
+{% endblock %}

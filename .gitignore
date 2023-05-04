@@ -1,0 +1,9 @@
+# FILES TO REMOVE FROM GIT
+media/*
+# migrations/*
+__pycache__/*
+*.pyc
+.env
+venv
+__pycache__
+filepond-temp-uploads/

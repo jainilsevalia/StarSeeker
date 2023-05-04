@@ -1,0 +1,328 @@
+{% load static %}
+<form class="fs-9" id="edit-profile">
+    {% csrf_token %}
+    <div class="d-flex align-items-center">
+      <div class="profile-picture-container mb-3">
+        <img
+            src="
+            {% if user.profile_picture %}
+                {{ user.profile_picture.url }}
+            {% else %}
+                {% static './img/avatar.png' %}
+            {% endif %}
+            "
+            id="profile-picture"
+            class="rounded-circle"
+            width="110px"
+            height="110px"
+        />
+      </div>
+      <input
+        type="file"
+        accept="image/*"
+        id="upload-image"
+        onchange="showImagePreview()"
+        hidden
+      />
+      <label for="upload-image" class="btn btn-primary fs-1 mx-2"
+        >Upload</label
+      >
+
+      <div id="delete-btn-div">
+        {% if user.profile_picture %}
+        <button
+          type="button"
+          class="btn btn-secondary fs-1"
+          style="margin-bottom: 2.5px"
+          onclick="wantToDelete()"
+        >
+          Delete
+        </button>
+        {% endif %}
+      </div>
+    </div>
+    <div
+      id="delete-pic-alert"
+      class="d-none alert alert-danger w-75 flex-column"
+    >
+      <span class="mb-1"
+        >Are you sure you want to delete profile picture ?</span
+      >
+      <div>
+        <button
+          type="button"
+          id="yes-delete"
+          class="btn btn-primary fs-9"
+          onclick="deleteProfilePic()"
+        >
+          Yes
+        </button>
+        <button
+          type="button"
+          id="no-delete"
+          class="btn btn-secondary fs-9"
+          onclick="dontDelete()"
+        >
+          No
+        </button>
+      </div>
+    </div>
+    <div class="form-group w-75">
+      <label for="name">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        value="{{ user.name }}"
+      />
+      <!-- <small class="form-text text-muted">
+        If you are talent user your name will not be fully visible on
+        this platform
+      </small> -->
+    </div>
+    {% if user.talentuser.id %}
+    <div class="form-group w-75">
+      <label for="userlink">Public profile url</label>
+      <div class="d-flex align-items-center mt-1">
+        <b>{{ request.get_host }}/tp/&nbsp;</b>
+        <input
+          type="text"
+          class="form-control"
+          style="max-width: 150px"
+          id="userlink"
+          value="{{ user.userlink }}"
+          onchange="verifyUserLink()"
+        />
+      </div>
+      <small id="userlink-error" class="form-text text-danger"></small>
+    </div>
+    {% endif %}
+    <div class="form-group w-75">
+      <label for="phone_number">Phone number</label>
+      <input
+        type="text"
+        class="form-control"
+        id="phone_number"
+        value="{{ user.phone_number }}"
+      />
+    </div>
+    <div
+      id="profile-update-alert"
+      class="d-none alert alert-success fade show w-75"
+      role="alert"
+    >
+      Your Information updated successfully (if any changes)
+    </div>
+    <div
+      id="profile-error-alert"
+      class="d-none alert alert-danger fade show w-75"
+      role="alert"
+    >
+    </div>
+    <button
+      type="submit"
+      class="btn btn-primary fs-1"
+      id="profileSaveBtn"
+    >
+      Save
+    </button>
+  </form>
+    <!-- IMAGE PERVIEW MODAL  -->
+    <div
+      class="modal fade"
+      id="previewImageModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="previewImageModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div
+            class="modal-header d-flex align-items-center justify-content-start"
+          >
+            <span data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true"><i class="bi bi-arrow-left"></i></span>
+            </span>
+            <div
+              class="modal-title fs-1 font-weight-bold ml-1"
+              id="previewImageModalLabel"
+            >
+              Crop
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary ml-auto fs-9 "
+              onclick="saveProfilePicture()"
+            >
+              Save
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <div id="crop-image"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- <div class="hr-simple mt-3 w-75"></div>
+  
+  {% if user.talentuser.category %}
+    <div class="mt-3 w-75">
+      <p class="fs-9">Manage your public profile by clicking on below button.</p>
+      <a class="btn btn-primary fs-9" href="{% url 'edittalentprofile' %}">Edit public profile</a>
+    </div>
+  {% else %}
+  <div class="mt-3 w-75">
+    <p class="fs-9">Register on DuniyaDekhegi as a talent user. by clicking on below button you will be redirected to setup your public profile</p>
+    <a class="btn btn-primary fs-9" href="{% url 'edittalentprofile' %}">Register as talent</a>
+  </div>
+  {% endif %} -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"
+    integrity="sha512-Gs+PsXsGkmr+15rqObPJbenQ2wB3qYvTHuJO6YJzPe/dTLvhy0fmae2BcnaozxDo5iaF8emzmCZWbQ1XXiX2Ig=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript"> 
+  let croppedImage = $("#crop-image").croppie({
+    viewport: { width: 300, height: 300, type: "square" },
+    boundary: { width: 400, height: 400 },
+  });
+
+  const showImagePreview = () => {
+    let reader = new FileReader();
+    const img = document.querySelector("#upload-image");
+    reader.readAsDataURL(img.files[0]);
+    reader.onload = (e) => {
+      croppedImage
+        .croppie("bind", {
+          url: event.target.result,
+        })
+        .then(() => {
+          $(".cr-slider").attr({ min: 0.2, max: 1.5 });
+        });
+    };
+    $("#previewImageModal").modal("show");
+  };
+
+
+  const saveProfilePicture = async () => {
+    const data = new FormData();
+    data.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+    await croppedImage
+      .croppie("result", { type: "blob", format: "png" })
+      .then((blob) => {
+        data.append("image", blob);
+      });
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: data,
+      async: true,
+      cache: false,
+      processData: false,
+      contentType: false,
+      success: (response) => {
+        if (response["success"]) {
+          // const profilePicture = document.querySelector("#profile-picture");
+          // profilePicture.setAttribute("src", '{% if user.profile_picture %}{{user.profile_picture.url}}{% endif %}');
+          // const headerProfilePic = document.querySelector(
+          //   "#header-profile-pic"
+          // );
+          // headerProfilePic.setAttribute("src", '{% if user.profile_picture %}{{user.profile_picture.url}}{% endif %}');
+          // $("#delete-btn-div").load(location.href + " #delete-btn-div>*");
+          location.reload();
+        }
+        if (response["error"]) {
+          console.log(error);
+        }
+      },
+    });
+    $("#previewImageModal").modal("hide");
+  };
+
+  const deleteAlert = document.querySelector("#delete-pic-alert");
+  const wantToDelete = () => {
+    deleteAlert.classList.remove("d-none");
+    deleteAlert.classList.add("d-flex");
+    deleteAlert.classList.remove("fade-out");
+    deleteAlert.classList.add("fade-in");
+  };
+
+  const deleteProfilePic = () => {
+    $.ajax({
+      type: "DELETE",
+      url: "{% url 'editprofile' %}",
+      dataType: "json",
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+      },
+      success: (response) => {
+        const profilePicture = document.querySelector("#profile-picture");
+        profilePicture.setAttribute("src", "{% static './img/avatar.png' %}");
+        const headerProfilePic = document.querySelector("#header-profile-pic");
+        headerProfilePic.setAttribute("src", "{% static './img/avatar.png' %}");
+        $("#delete-btn-div").load(location.href + " #delete-btn-div>*");
+      },
+    });
+    deleteAlert.classList.remove("d-flex");
+    deleteAlert.classList.add("d-none");
+  };
+
+  const dontDelete = () => {
+    deleteAlert.classList.remove("d-flex");
+    deleteAlert.classList.add("d-none");
+  };
+
+  const verifyUserLink = () => {
+    const error = document.querySelector("#userlink-error");
+    error.classList.add("d-block");
+    $.ajax({
+      type: "GET",
+      url: "{% url 'editprofile' %}",
+      data: {
+        userlink: $("#userlink").val(),
+      },
+      success: (response) => {
+        if (response["error"]) {
+          error.innerHTML = response["error"];
+          const profileSaveBtn = document.querySelector("#profileSaveBtn");
+          profileSaveBtn.setAttribute("disabled", "disabled");
+        }
+        if (response["success"]) {
+          error.innerHTML = "";
+          profileSaveBtn.removeAttribute("disabled");
+        }
+      },
+    });
+  };
+
+  $(document).on("submit", "#edit-profile", (e) => {
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'editprofile' %}",
+      data: {
+        name: $("#name").val(),
+        userlink: $("#userlink").val(),
+        phone_number: $("#phone_number").val(),
+        csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+      },
+      success: (response) => {
+        if (response["success"]) {
+          const success = document.querySelector("#profile-update-alert");
+          success.classList.remove("d-none");
+          const error = document.querySelector("#profile-error-alert");
+          error.classList.add("d-none");
+        }
+        if (response["error"]){
+          const error = document.querySelector("#profile-error-alert");
+          error.innerHTML = response["error-msg"]
+          error.classList.remove("d-none");
+          const success = document.querySelector("#profile-update-alert");
+          success.classList.add("d-none");
+        }
+      },
+    });
+  });
+</script>

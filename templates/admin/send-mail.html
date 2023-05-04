@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Send mail{% endblock %}
+{% block content %}
+    <h1>Send email to selected users</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <table style="width: 100%">
+            <tr>
+                <td>Subject:</td>
+                <td><input id="subject" name="subject" type="text" required/></td>
+            </tr>
+            <tr>
+                <td>Heading:</td>
+                <td><input id="heading" name="heading" type="text" required/></td>
+            </tr>
+            <tr>
+                <td>Message:</td>
+                <td><textarea id="message" name="message" required></textarea></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="submit-row" style="text-align: right;">
+                    <input type="submit" name="send" value="Send"/>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="action" value="send_mail" />
+        {% for user in users %}
+            <input type="hidden" name="_selected_action" value="{{ user.pk }}" />    
+        {% endfor %}
+    </form>
+{% endblock %}

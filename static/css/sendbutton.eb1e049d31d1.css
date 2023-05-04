@@ -1,0 +1,39 @@
+.submit-button {
+  font-weight: 600;
+  letter-spacing: 1px;
+  height: 38px;
+  width: 120px;
+  line-height: 38px;
+  overflow: hidden;
+  background: #cc33cc;
+  border-radius: 30px;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.submit-button:hover {
+  background: #8e0091;
+}
+.submit-button.animated {
+  -webkit-animation: 0.75s short-press cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  animation: 0.75s short-press cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+.submit-button > span {
+  display: block;
+  color: white;
+  text-align: center;
+}
+.submit-button > span.pre-state-msg {
+  transition: all 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  transition-delay: 0.75s;
+}
+.submit-button.state-1 .pre-state-msg {
+  margin-top: -38px;
+}
+.submit-button.state-2 .pre-state-msg {
+  margin-top: -76px;
+}
+.submit-button.disabled {
+  background-color: #aaaaaa;
+  cursor: not-allowed;
+}

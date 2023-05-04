@@ -1,0 +1,494 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+<div class="row px-4" style="gap: 30px;">
+    <div class="col">
+        <div class="px-1">
+            <div class="d-flex align-items-center">
+                <h4><strong>Store information</strong></h4>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <!-- STORE LOGO  -->
+                    <div class="d-flex align-items-center mt-3">
+                        <div class="profile-picture-container mb-3">
+                          <img
+                              src="
+                              {% if user.seller.store_logo %}
+                                  {{ user.seller.store_logo.url }}
+                              {% else %}
+                                  {% static './img/store.png' %}
+                              {% endif %}
+                              "
+                              id="profile-picture"
+                              class="rounded-circle"
+                              width="110px"
+                              height="110px"
+                              style="background-color: rgb(71, 71, 71);"
+                          />
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          id="upload-image"
+                          onchange="showImagePreview()"
+                          hidden
+                        />
+                        <label for="upload-image" class="btn btn-primary fs-1 mx-2"
+                          >Upload</label
+                        >
+                  
+                        <div id="delete-btn-div">
+                          {% if user.seller.store_logo %}
+                          <button
+                            type="button"
+                            class="btn btn-secondary fs-1"
+                            style="margin-bottom: 2.5px"
+                            onclick="wantToDelete()"
+                          >
+                            Delete
+                          </button>
+                          {% endif %}
+                        </div>
+                    </div>
+                    <div
+                    id="delete-pic-alert"
+                    class="d-none alert alert-danger flex-column"
+                    >
+                        <span class="mb-1"
+                            >Are you sure you want to delete profile picture ?</span
+                        >
+                        <div>
+                            <button
+                            type="button"
+                            id="yes-delete"
+                            class="btn btn-primary fs-9"
+                            onclick="deleteProfilePic()"
+                            >
+                            Yes
+                            </button>
+                            <button
+                            type="button"
+                            id="no-delete"
+                            class="btn btn-secondary fs-9"
+                            onclick="dontDelete()"
+                            >
+                            No
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="store-name">Store name</label>
+                        <input
+                            type="store-name"
+                            class="form-control"
+                            id="store-name"
+                            value="{{ user.seller.store_name }}"
+                            onchange="verfiyStoreName()"
+                            required
+                        />
+                        <small id="store-name-error" class="form-text text-danger"></small>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-2">
+                        <label for="store-description">Store description</label>
+                        <textarea class="w-100 h-100" id="store-description" rows="6" required maxlength="250">{{ user.seller.store_description }}</textarea>
+                    </div>
+                    <div>
+                        <button id="store-info-save" class="btn btn-primary fs-95 float-right" onclick="saveStoreInfo()">Save</button>
+                    </div>
+                </div>
+            </div>
+            <h4 class="mb-4"><strong>Your inventory</strong></h4>
+            <div class="product-cards">
+                {% for product in products %}
+                <div class="product-card box-shadow-outset br-20 p-3">
+                    {% if product.isVideoThumbnail %}
+                    <video src="{{ product.thumbnail.url }}" class="object-fit-cover br-20 aspect-ratio-1 w-100"></video>
+                    {% else %}
+                    <img class="object-fit-cover br-20 aspect-ratio-1" src="{{ product.thumbnail.url }}" width="100%" />
+                    {% endif %}
+
+                    <div class="px-2 mt-2">
+                        <div class="fs-9"><strong style="color: grey;text-transform: uppercase;">{{ product.category }}</strong></div>
+                        <div>
+                            <strong>{{ product.name }}</strong>
+                            <strong class="float-right">⭐ {{ product.rating }}</strong>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between">
+                            <h5 class="pt-2"><strong>₹ {{ product.price }}</strong></h5>
+                            <div class="d-flex" style="gap: 10px;">
+                                <div x-data="{ product: { id: '{{ product.id }}',name: '{{ product.name }}', price: '{{ product.price }}',category: '{{ product.category }}',description: '{{ product.description }}', media: {{ product.media  }} } }"
+                                    class="circle-icon bg-darkbluegray bg-hover-blue" style="font-size: 1.4em;width: 40px;height: 40px"
+                                    @click="fillProductDetails(product)">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div class="circle-icon bg-darkbluegray bg-hover-red" style="font-size: 1.4em;width: 40px;height: 40px"
+                                    onclick="showDeleteAlert('product-{{ product.id }}')"><i class="bi bi-trash"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id='product-{{ product.id }}' class="mt-3"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h4><strong>Add/Edit Product</strong></h4>
+        <form id="addProduct" class="fs-9">
+            <div class="d-flex ">
+                <div class="form-group w-100">
+                    <label for="product-name">Name</label>
+                    <input type="text" class="form-control" id="product-name" required />
+                </div>
+                <div class="form-group ml-3">
+                    <label for="product-price">Price</label>
+                    <input type="text" class="form-control" id="product-price" required />
+                </div>
+            </div>
+            <div class="box-selectpicker d-flex flex-column mb-3">
+                <label for="product-category" class="mb-2">Category</label>
+                <select id="product-category" class="selectpicker">
+                    {% for category in product_categories %}
+                    <option value="{{category}}">{{category|title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class=" my-3">
+                <label for="drag-drop-area" class="mb-2">Upload media</label>
+                <div id="drag-drop-area"></div>
+            </div>
+            <div class="d-flex flex-column">
+                <label for="product-description">Description</label>
+                <textarea class="w-100" id="product-description" cols="30" rows="10" required></textarea>
+            </div>
+            <div class="mt-3">
+                <button type="submit" id="submit-btn" class="btn btn-primary fs-1">
+                    Add Product
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- IMAGE PERVIEW MODAL  -->
+<div
+    class="modal"
+    id="previewImageModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="previewImageModalLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div
+        class="modal-header d-flex align-items-center justify-content-start"
+        >
+        <span data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"><i class="bi bi-arrow-left"></i></span>
+        </span>
+        <div
+            class="modal-title fs-1 font-weight-bold ml-1"
+            id="previewImageModalLabel"
+        >
+            Crop
+        </div>
+        <button
+            type="button"
+            class="btn btn-primary ml-auto fs-9 "
+            onclick="saveProfilePicture()"
+        >
+            Save
+        </button>
+        </div>
+        <div class="modal-body">
+        <div>
+            <div id="crop-image"></div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script src="https://releases.transloadit.com/uppy/v2.4.1/uppy.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"
+    integrity="sha512-Gs+PsXsGkmr+15rqObPJbenQ2wB3qYvTHuJO6YJzPe/dTLvhy0fmae2BcnaozxDo5iaF8emzmCZWbQ1XXiX2Ig=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+    const uppy = new Uppy.Core({
+        restrictions: {
+            maxFileSize: 10000000,
+            maxNumberOfFiles: 5,
+            minNumberOfFiles: 1,
+            allowedFileTypes: ['image/*', 'video/*']
+        }
+    });
+    uppy.use(Uppy.Dashboard, {
+        target: '#drag-drop-area',
+        inline: true,
+        hideUploadButton: true,
+        proudlyDisplayPoweredByUppy: false,
+    })
+    uppy.use(Uppy.ImageEditor, { target: Uppy.Dashboard })
+    uppy.use(Uppy.XHRUpload, {
+        endpoint: "{% url 'add_product' %}",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        bundle: true,
+    })
+    $("#addProduct").submit((e) => {
+        e.preventDefault();
+        uppy.setMeta({
+            name: $("#product-name").val(),
+            price: $("#product-price").val(),
+            category: $("#product-category").val(),
+            description: $("#product-description").val(),
+        })
+        uppy.upload();
+    })
+    uppy.on('complete', (result) => {
+        Toastify({
+            text: result.successful[0].response.body.msg,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#5abab7",
+            style: {
+                borderRadius: "20px"
+            },
+            stopOnFocus: true,
+            callback: () => {
+                location.reload()
+            }
+        }).showToast();
+    })
+    uppy.on('error', error => {
+        Toastify({
+            text: error,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "brown",
+            style: {
+                borderRadius: "20px"
+            },
+            stopOnFocus: true,
+        }).showToast();
+    })
+
+    const getFetchPath = (mediaPath) => {
+        let fetchpath = '';
+        if('{% if user.seller.store_logo %}{{ user.seller.store_logo.url }}{% endif %}'.includes('s3')){
+            fetchpath = 'https://partypakkis3bucket.s3.amazonaws.com/duniyadekhegi/dd_media/' + mediaPath
+        }else{
+            fetchpath = '/' + mediaPath;
+        };
+        return fetchpath
+    }
+
+    let prevProductId;
+    const fillProductDetails = (product) => {
+        $("#product-name").val(product.name)
+        $("#product-price").val(product.price)
+        $("#product-category").selectpicker('val', product.category)
+        $("#product-description").val(product.description)
+        $("#submit-btn").text("Edit product")
+        
+        if(prevProductId !== product.id){
+            uppy.cancelAll();
+            product.media.images.forEach((image) => {
+                const fetchpath = getFetchPath(image);
+                fetch(fetchpath).then(res => res.blob()).then(blob => {
+                    const imageName = image.replace(/^.*[\\\/]/, ''); // to get file-name from path
+                    const imageType = imageName.split('.')[1]
+                    uppy.addFile({
+                        name: imageName,
+                        type: `image/${imageType}`,
+                        data: blob,
+                    });
+                });
+            });
+
+            product.media.videos.forEach(video => {
+                const fetchpath = getFetchPath(video);
+                fetch(fetchpath).then(res => res.blob()).then(blob => {
+                    const videoName = video.replace(/^.*[\\\/]/, '');
+                    const videoType = videoName.split('.')[1]
+                    uppy.addFile({
+                        name: videoName,
+                        type: `video/${videoType}`,
+                        data: blob,
+                    });
+                });
+            })
+        }
+        prevProductId = product.id;
+    }
+
+    const deleteProduct = (id) => {
+        const product_id = id.substring(8)
+        $.ajax({
+            type: "POST",
+            url: "{% url 'manage_store' %}",
+            data: {
+                product_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: (res) => {
+                if(res["success"]){
+                    location.reload();
+                }
+            }
+        })
+    }
+    
+    const showDeleteAlert = (id) => {
+        alert({
+            elementId: id,
+            text: "Are you sure you want to remove this product ?",
+            confirmButtonTxt: 'Yes',
+            onConfirm: () => deleteProduct(id)
+        })
+    }
+
+    // STORE LOGO RELATED SCRIPT 
+    let croppedImage = $("#crop-image").croppie({
+        viewport: { width: 300, height: 300, type: "square" },
+        boundary: { width: 400, height: 400 },
+    });
+
+  const showImagePreview = () => {
+    let reader = new FileReader();
+    const img = document.querySelector("#upload-image");
+    reader.readAsDataURL(img.files[0]);
+    reader.onload = (e) => {
+      croppedImage
+        .croppie("bind", {
+          url: event.target.result,
+        })
+        .then(() => {
+          $(".cr-slider").attr({ min: 0.2, max: 1.5 });
+        });
+    };
+    $("#previewImageModal").modal("show");
+  };
+
+
+  const saveProfilePicture = async () => {
+    const data = new FormData();
+    data.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+    await croppedImage
+      .croppie("result", { type: "blob", format: "png" })
+      .then((blob) => {
+        data.append("image", blob);
+      });
+    $.ajax({
+      type: "POST",
+      url: "{% url 'manage_store' %}",
+      data: data,
+      async: true,
+      cache: false,
+      processData: false,
+      contentType: false,
+      success: (response) => {
+        if (response["success"]) {
+          location.reload();
+        }
+        if (response["error"]) {
+          console.log(error);
+        }
+      },
+    });
+    $("#previewImageModal").modal("hide");
+  };
+
+  const deleteAlert = document.querySelector("#delete-pic-alert");
+  const wantToDelete = () => {
+    deleteAlert.classList.remove("d-none");
+    deleteAlert.classList.add("d-flex");
+    deleteAlert.classList.remove("fade-out");
+    deleteAlert.classList.add("fade-in");
+  };
+
+  const deleteProfilePic = () => {
+    $.ajax({
+      type: "DELETE",
+      url: "{% url 'manage_store' %}",
+      dataType: "json",
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+      },
+      success: (response) => {
+        const profilePicture = document.querySelector("#profile-picture");
+        profilePicture.setAttribute("src", "{% static './img/avatar.png' %}");
+        const headerProfilePic = document.querySelector("#header-profile-pic");
+        headerProfilePic.setAttribute("src", "{% static './img/avatar.png' %}");
+        $("#delete-btn-div").load(location.href + " #delete-btn-div>*");
+      },
+    });
+    deleteAlert.classList.remove("d-flex");
+    deleteAlert.classList.add("d-none");
+  };
+
+  const dontDelete = () => {
+    deleteAlert.classList.remove("d-flex");
+    deleteAlert.classList.add("d-none");
+  };
+
+  // VERIFY STORE-NAME
+  const verfiyStoreName = () => {
+    const error = document.querySelector("#store-name-error");
+    error.classList.add("d-block");
+    $.ajax({
+      type: "GET",
+      url: "{% url 'manage_store' %}",
+      data: {
+        store_name: $("#store-name").val(),
+      },
+      success: (response) => {
+          const storeInfoSaveBtn = document.querySelector("#store-info-save");
+        if (response["error"]) {
+          error.innerHTML = response["error"];
+          storeInfoSaveBtn.setAttribute("disabled", "disabled");
+        }
+        if (response["success"]) {
+          error.innerHTML = "";
+          storeInfoSaveBtn.removeAttribute("disabled");
+        }
+      },
+    });
+  };
+
+  const saveStoreInfo = () => {
+      $.ajax({
+          type: "POST",
+          url: "{% url 'manage_store' %}",
+        data: {
+            store_name: $("#store-name").val(),
+            store_desc: $("#store-description").val(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        },
+        success: (response) => {
+            if (response["success"]) {
+                Toastify({
+                    text: "Store details change successfully",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        borderRadius: "20px"
+                    },
+                    stopOnFocus: true,
+                }).showToast();
+            }
+        },
+      })
+  }
+</script>
+{% endblock %}
